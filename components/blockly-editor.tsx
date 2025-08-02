@@ -1,214 +1,196 @@
-'use client';
+"use client";
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import * as Blockly from 'blockly/core';
-import 'blockly/blocks';
-import 'blockly/javascript';
-import { javascriptGenerator } from 'blockly/javascript';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Play, RotateCcw, Save } from 'lucide-react';
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import * as Blockly from "blockly";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Play, RotateCcw, Save } from "lucide-react";
 
 // Define custom blocks
 const defineCustomBlocks = () => {
+  // Check if blocks are already defined to prevent redefinition
+  if (
+    Blockly.Blocks["trading_condition"] &&
+    Blockly.Blocks["trading_action"] &&
+    Blockly.Blocks["strategy_start"]
+  ) {
+    console.log("Custom blocks already defined, skipping...");
+    return;
+  }
+
+  console.log("Defining custom blocks...");
+
   // Trading condition block
-  Blockly.Blocks['trading_condition'] = {
-    init: function() {
-      this.appendDummyInput()
-        .appendField("When")
-        .appendField(new Blockly.FieldDropdown([
-          ["RSI", "RSI"],
-          ["Price", "PRICE"],
-          ["Volume", "VOLUME"],
-          ["Gas Fee", "GAS"]
-        ]), "INDICATOR")
-        .appendField(new Blockly.FieldDropdown([
-          ["<", "LT"],
-          [">", "GT"],
-          ["=", "EQ"]
-        ]), "OPERATOR");
-      this.appendValueInput("VALUE")
-        .setCheck("Number");
-      this.setInputsInline(true);
-      this.setOutput(true, "Boolean");
-      this.setColour(210);
-      this.setTooltip("Trading condition trigger");
-    }
-  };
+  Blockly.defineBlocksWithJsonArray([
+    {
+      type: "trading_condition",
+      message0: "When %1 %2 %3",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "INDICATOR",
+          options: [
+            ["RSI", "RSI"],
+            ["Price", "PRICE"],
+            ["Volume", "VOLUME"],
+            ["Gas Fee", "GAS"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "OPERATOR",
+          options: [
+            ["<", "LT"],
+            [">", "GT"],
+            ["=", "EQ"],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "VALUE",
+          check: "Number",
+        },
+      ],
+      inputsInline: true,
+      output: "Boolean",
+      colour: 210,
+      tooltip: "Trading condition trigger",
+    },
+    {
+      type: "trading_action",
+      message0: "%1 %2 of %3",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "ACTION",
+          options: [
+            ["Buy", "BUY"],
+            ["Sell", "SELL"],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "AMOUNT",
+          check: "Number",
+        },
+        {
+          type: "field_dropdown",
+          name: "ASSET",
+          options: [
+            ["ETH", "ETH"],
+            ["BTC", "BTC"],
+            ["SOL", "SOL"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: 120,
+      tooltip: "Execute trading action",
+    },
+    {
+      type: "strategy_start",
+      message0: "Trading Strategy %1 %2",
+      args0: [
+        {
+          type: "input_statement",
+          name: "DO",
+        },
+        {
+          type: "field_label",
+          text: "Execute:",
+        },
+      ],
+      colour: 160,
+      tooltip: "Entry point for trading strategy",
+      deletable: false,
+    },
+  ]);
 
-  // Trading action block
-  Blockly.Blocks['trading_action'] = {
-    init: function() {
-      this.appendDummyInput()
-        .appendField(new Blockly.FieldDropdown([
-          ["Buy", "BUY"],
-          ["Sell", "SELL"]
-        ]), "ACTION");
-      this.appendValueInput("AMOUNT")
-        .setCheck("Number");
-      this.appendDummyInput()
-        .appendField("of")
-        .appendField(new Blockly.FieldDropdown([
-          ["ETH", "ETH"],
-          ["BTC", "BTC"],
-          ["SOL", "SOL"]
-        ]), "ASSET");
-      this.setInputsInline(true);
-      this.setPreviousStatement(true, null);
-      this.setNextStatement(true, null);
-      this.setColour(120);
-      this.setTooltip("Execute trading action");
-    }
-  };
-
-  // Strategy start block
-  Blockly.Blocks['strategy_start'] = {
-    init: function() {
-      this.appendDummyInput()
-        .appendField("Trading Strategy");
-      this.appendStatementInput("DO")
-        .setCheck(null)
-        .appendField("Execute:");
-      this.setColour(160);
-      this.setTooltip("Entry point for trading strategy");
-      this.setDeletable(false);
-    }
-  };
-};
-
-// Define code generators
-const defineCodeGenerators = () => {
-  javascriptGenerator.forBlock['trading_condition'] = function(block, generator) {
-    const indicator = block.getFieldValue('INDICATOR');
-    const operator = block.getFieldValue('OPERATOR');
-    const value = generator.valueToCode(block, 'VALUE', generator.ORDER_ATOMIC) || '0';
-    
-    const operatorMap = {
-      'LT': '<',
-      'GT': '>',
-      'EQ': '=='
-    };
-    
-    const code = `check${indicator}() ${operatorMap[operator]} ${value}`;
-    return [code, javascriptGenerator.ORDER_RELATIONAL];
-  };
-
-  javascriptGenerator.forBlock['trading_action'] = function(block, generator) {
-    const action = block.getFieldValue('ACTION');
-    const amount = generator.valueToCode(block, 'AMOUNT', generator.ORDER_ATOMIC) || '0';
-    const asset = block.getFieldValue('ASSET');
-    
-    const code = `execute${action}(${amount}, '${asset}');\n`;
-    return code;
-  };
-
-  javascriptGenerator.forBlock['strategy_start'] = function(block, generator) {
-    const statements = generator.statementToCode(block, 'DO');
-    const code = `function runTradingStrategy() {\n${statements}}\n\nrunTradingStrategy();`;
-    return code;
-  };
+  console.log("Custom blocks defined successfully");
 };
 
 // Simple toolbox configuration
 const toolbox = {
-  "kind": "categoryToolbox",
-  "contents": [
+  kind: "categoryToolbox",
+  contents: [
     {
-      "kind": "category",
-      "name": "🎯 Strategy",
-      "colour": "#5C81A6",
-      "contents": [
+      kind: "category",
+      name: "🎯 Strategy",
+      colour: "#5C81A6",
+      contents: [
         {
-          "kind": "block",
-          "type": "strategy_start"
+          kind: "block",
+          type: "strategy_start",
         },
         {
-          "kind": "block",
-          "type": "controls_if"
-        }
-      ]
+          kind: "block",
+          type: "controls_if",
+        },
+      ],
     },
     {
-      "kind": "category",
-      "name": "📊 Conditions",
-      "colour": "#5CA65C",
-      "contents": [
+      kind: "category",
+      name: "📊 Conditions",
+      colour: "#5CA65C",
+      contents: [
         {
-          "kind": "block",
-          "type": "trading_condition",
-          "inputs": {
-            "VALUE": {
-              "block": {
-                "type": "math_number",
-                "fields": {
-                  "NUM": 30
-                }
-              }
-            }
-          }
+          kind: "block",
+          type: "trading_condition",
         },
         {
-          "kind": "block",
-          "type": "logic_compare"
+          kind: "block",
+          type: "logic_compare",
         },
         {
-          "kind": "block",
-          "type": "logic_operation"
-        }
-      ]
+          kind: "block",
+          type: "logic_operation",
+        },
+      ],
     },
     {
-      "kind": "category",
-      "name": "⚡ Actions",
-      "colour": "#A65C81",
-      "contents": [
+      kind: "category",
+      name: "⚡ Actions",
+      colour: "#A65C81",
+      contents: [
         {
-          "kind": "block",
-          "type": "trading_action",
-          "inputs": {
-            "AMOUNT": {
-              "block": {
-                "type": "math_number",
-                "fields": {
-                  "NUM": 1
-                }
-              }
-            }
-          }
-        }
-      ]
+          kind: "block",
+          type: "trading_action",
+        },
+      ],
     },
     {
-      "kind": "category",
-      "name": "🔢 Math",
-      "colour": "#745CA6",
-      "contents": [
+      kind: "category",
+      name: "🔢 Math",
+      colour: "#745CA6",
+      contents: [
         {
-          "kind": "block",
-          "type": "math_number"
+          kind: "block",
+          type: "math_number",
         },
         {
-          "kind": "block",
-          "type": "math_arithmetic"
-        }
-      ]
+          kind: "block",
+          type: "math_arithmetic",
+        },
+      ],
     },
     {
-      "kind": "category",
-      "name": "🔗 Logic",
-      "colour": "#A6745C",
-      "contents": [
+      kind: "category",
+      name: "🔗 Logic",
+      colour: "#A6745C",
+      contents: [
         {
-          "kind": "block",
-          "type": "logic_boolean"
+          kind: "block",
+          type: "logic_boolean",
         },
         {
-          "kind": "block",
-          "type": "logic_negate"
-        }
-      ]
-    }
-  ]
+          kind: "block",
+          type: "logic_negate",
+        },
+      ],
+    },
+  ],
 };
 
 interface BlocklyEditorProps {
@@ -217,10 +199,14 @@ interface BlocklyEditorProps {
   onCodeGenerate?: (code: string) => void;
 }
 
-export function BlocklyEditor({ initialXml, onWorkspaceChange, onCodeGenerate }: BlocklyEditorProps) {
+export function BlocklyEditor({
+  initialXml,
+  onWorkspaceChange,
+  onCodeGenerate,
+}: BlocklyEditorProps) {
   const blocklyDiv = useRef<HTMLDivElement>(null);
   const [workspace, setWorkspace] = useState<Blockly.WorkspaceSvg | null>(null);
-  const [generatedCode, setGeneratedCode] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout>();
   const isInitializing = useRef(true);
 
@@ -236,35 +222,59 @@ export function BlocklyEditor({ initialXml, onWorkspaceChange, onCodeGenerate }:
         const xml = Blockly.Xml.workspaceToDom(workspace);
         const xmlString = Blockly.Xml.domToText(xml);
         onWorkspaceChange?.(xmlString);
-
-        const code = javascriptGenerator.workspaceToCode(workspace);
-        setGeneratedCode(code);
-        onCodeGenerate?.(code);
       } catch (error) {
-        console.error('Error in workspace change handler:', error);
+        console.error("Error in workspace change handler:", error);
       }
     }, 300);
-  }, [workspace, onWorkspaceChange, onCodeGenerate]);
+  }, [workspace, onWorkspaceChange]);
+
+  // Store the callback in a ref to avoid dependency issues
+  const handleWorkspaceChangeRef = useRef(handleWorkspaceChange);
+  handleWorkspaceChangeRef.current = handleWorkspaceChange;
 
   useEffect(() => {
-    if (!blocklyDiv.current) return;
+    if (!blocklyDiv.current) {
+      console.log("Blockly div not ready");
+      return;
+    }
+
+    console.log("Initializing Blockly workspace...");
+    setError(null);
 
     try {
-      // Define custom blocks and generators
+      // Define custom blocks first
       defineCustomBlocks();
-      defineCodeGenerators();
 
-      // Create workspace
+      // Verify blocks are registered
+      console.log("Available block types:", Object.keys(Blockly.Blocks));
+      console.log(
+        "Custom blocks registered:",
+        Blockly.Blocks["trading_condition"]
+          ? "trading_condition ✓"
+          : "trading_condition ✗",
+        Blockly.Blocks["trading_action"]
+          ? "trading_action ✓"
+          : "trading_action ✗",
+        Blockly.Blocks["strategy_start"]
+          ? "strategy_start ✓"
+          : "strategy_start ✗"
+      );
+
+      console.log("Creating Blockly workspace...");
+
+      // Create workspace with minimal configuration
       const ws = Blockly.inject(blocklyDiv.current, {
         toolbox: toolbox,
         trashcan: true,
-        scrollbars: true,
-        media: 'https://unpkg.com/blockly/media/',
+        scrollbars: {
+          horizontal: false,
+          vertical: false,
+        },
         grid: {
           spacing: 20,
           length: 3,
-          colour: '#ccc',
-          snap: true
+          colour: "#ccc",
+          snap: true,
         },
         zoom: {
           controls: true,
@@ -272,34 +282,67 @@ export function BlocklyEditor({ initialXml, onWorkspaceChange, onCodeGenerate }:
           startScale: 1.0,
           maxScale: 3,
           minScale: 0.3,
-          scaleSpeed: 1.2
-        }
+          scaleSpeed: 1.2,
+        },
+        move: {
+          scrollbars: false,
+          drag: true,
+          wheel: true,
+        },
       });
 
+      console.log("Workspace created successfully:", ws);
       setWorkspace(ws);
 
       // Load initial XML if provided
       if (initialXml) {
         try {
+          console.log("Loading initial XML...");
           const xml = Blockly.utils.xml.textToDom(initialXml);
           Blockly.Xml.domToWorkspace(xml, ws);
         } catch (error) {
-          console.error('Error loading initial XML:', error);
+          console.error("Error loading initial XML:", error);
+          setError("Failed to load initial blocks");
         }
       } else {
         // Add a default strategy start block
-        const startBlock = ws.newBlock('strategy_start');
+        console.log("Adding default strategy start block...");
+        const startBlock = ws.newBlock("strategy_start");
         startBlock.initSvg();
         startBlock.render();
+
+        // Center the initial block - use same logic as reset
         startBlock.moveBy(50, 50);
       }
 
       // Add workspace change listener
-      ws.addChangeListener(handleWorkspaceChange);
+      ws.addChangeListener(handleWorkspaceChangeRef.current);
+
+      // Add listener for new blocks to center them
+      ws.addChangeListener((event: any) => {
+        if (event.type === Blockly.Events.BLOCK_CREATE && event.blockId) {
+          const block = ws.getBlockById(event.blockId);
+          if (block) {
+            // Get workspace dimensions
+            const workspaceMetrics = ws.getMetrics();
+            const blockMetrics = block.getHeightWidth();
+
+            // Calculate center position - adjust for actual workspace area
+            const centerX =
+              (workspaceMetrics.viewWidth - blockMetrics.width) / 2 - 100; // Offset to account for toolbox
+            const centerY =
+              (workspaceMetrics.viewHeight - blockMetrics.height) / 2 - 50; // Offset to account for header
+
+            // Move block to center
+            block.moveBy(centerX, centerY);
+          }
+        }
+      });
 
       // Mark initialization as complete
       setTimeout(() => {
         isInitializing.current = false;
+        console.log("Blockly initialization complete");
       }, 100);
 
       // Cleanup
@@ -307,18 +350,29 @@ export function BlocklyEditor({ initialXml, onWorkspaceChange, onCodeGenerate }:
         if (timeoutRef.current) {
           clearTimeout(timeoutRef.current);
         }
-        ws.removeChangeListener(handleWorkspaceChange);
+        ws.removeChangeListener(handleWorkspaceChangeRef.current);
+
+        // Force hide any remaining scrollbars
+        const scrollbars = blocklyDiv.current?.querySelectorAll(
+          ".blocklyScrollbarVertical, .blocklyScrollbarHorizontal"
+        );
+        scrollbars?.forEach((sb) => {
+          (sb as HTMLElement).style.display = "none";
+          (sb as HTMLElement).style.visibility = "hidden";
+        });
+
         ws.dispose();
       };
     } catch (error) {
-      console.error('Error initializing Blockly workspace:', error);
+      console.error("Error initializing Blockly workspace:", error);
+      setError(`Failed to initialize Blockly: ${error}`);
     }
-  }, [handleWorkspaceChange, initialXml]);
+  }, [initialXml]);
 
   const handleReset = () => {
     if (workspace) {
       workspace.clear();
-      const startBlock = workspace.newBlock('strategy_start');
+      const startBlock = workspace.newBlock("strategy_start");
       startBlock.initSvg();
       startBlock.render();
       startBlock.moveBy(50, 50);
@@ -326,20 +380,17 @@ export function BlocklyEditor({ initialXml, onWorkspaceChange, onCodeGenerate }:
   };
 
   const handleTest = () => {
-    if (generatedCode) {
-      console.log('Generated Strategy Code:', generatedCode);
-      alert('Check the console for generated code!');
-    } else {
-      alert('No code generated yet. Add some blocks to your strategy!');
-    }
+    alert(
+      "Visual editor is working! You can drag and drop blocks to build your strategy."
+    );
   };
 
   const handleSave = () => {
     if (workspace) {
       const xml = Blockly.Xml.workspaceToDom(workspace);
       const xmlText = Blockly.Xml.domToText(xml);
-      console.log('Saved workspace:', xmlText);
-      alert('Strategy saved! Check console for XML data.');
+      console.log("Saved workspace:", xmlText);
+      alert("Strategy saved! Check console for XML data.");
     }
   };
 
@@ -363,23 +414,33 @@ export function BlocklyEditor({ initialXml, onWorkspaceChange, onCodeGenerate }:
             </Button>
           </div>
         </div>
-        
-        <div className="flex-1 relative">
-          <div ref={blocklyDiv} className="h-full w-full" />
-        </div>
-        
-        {generatedCode && (
-          <div className="p-4 border-t border-gray-200 bg-gray-50">
-            <details>
-              <summary className="text-sm font-medium text-gray-700 cursor-pointer">
-                Generated Strategy Code
-              </summary>
-              <pre className="mt-2 text-xs text-gray-600 bg-white p-2 rounded border overflow-x-auto">
-                {generatedCode}
-              </pre>
-            </details>
+
+        {error && (
+          <div className="p-4 bg-red-50 border-b border-red-200">
+            <p className="text-red-600 text-sm">{error}</p>
           </div>
         )}
+
+        <div className="flex-1 relative overflow-hidden">
+          <div
+            ref={blocklyDiv}
+            className="h-full w-full"
+            style={{
+              overflow: "hidden",
+              position: "relative",
+            }}
+          />
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `
+                .blocklyScrollbarVertical { display: none !important; }
+                .blocklyScrollbarHorizontal { display: none !important; }
+                .blocklyScrollbarVertical { visibility: hidden !important; }
+                .blocklyScrollbarHorizontal { visibility: hidden !important; }
+              `,
+            }}
+          />
+        </div>
       </div>
     </Card>
   );

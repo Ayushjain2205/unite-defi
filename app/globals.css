@@ -5,30 +5,57 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 }
 
@@ -37,10 +64,11 @@
     @apply border-border;
   }
   body {
-    @apply bg-white text-foreground;
+    @apply bg-background text-foreground;
   }
 }
 
+/* Orb gradient styles */
 .orb-gradient-1 {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #4c1d95 100%);
 }
@@ -66,7 +94,8 @@
 }
 
 @keyframes orb-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
   }
@@ -76,72 +105,109 @@
   }
 }
 
-.blockly-light-theme {
-  background-color: #ffffff !important;
-  border: 1px solid #e5e7eb !important;
-  border-radius: 8px !important;
+/* Blockly specific styles */
+.blocklyToolboxDiv {
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+  overflow-x: visible;
+  overflow-y: auto;
+  position: absolute;
+  z-index: 70;
 }
 
-.blockly-light-theme .blocklyToolboxDiv {
-  background-color: #f8f9fa !important;
-  border-right: 1px solid #e5e7eb !important;
+.blocklyFlyoutBackground {
+  fill: #f8f9fa;
+  fill-opacity: 0.9;
 }
 
-.blockly-light-theme .blocklyFlyout {
-  background-color: #ffffff !important;
+.blocklyMainBackground {
+  stroke-width: 1;
+  stroke: #c6c6c6;
 }
 
-.blockly-light-theme .blocklyMainBackground {
-  stroke: #e5e7eb !important;
-  fill: #ffffff !important;
+.blocklyPathLight {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 1;
 }
 
-.blockly-light-theme .blocklyScrollbarBackground {
-  fill: #f1f3f4 !important;
+.blocklySelected > .blocklyPath {
+  stroke: #fc3;
+  stroke-width: 2px;
 }
 
-.blockly-light-theme .blocklyScrollbarHandle {
-  fill: #c1c1c1 !important;
+.blocklyDragging > .blocklyPath,
+.blocklyDragging > .blocklyPathLight {
+  fill-opacity: 0.8;
+  stroke-opacity: 0.8;
 }
 
-/* Block styling improvements */
-.blocklyBlockCanvas .blocklyPath {
-  stroke-width: 2px !important;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)) !important;
+.blocklyResizeSE {
+  cursor: se-resize;
+  fill: #fc3;
 }
 
-.blocklyBlockCanvas:hover .blocklyPath {
-  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)) !important;
-  transform: translateY(-1px) !important;
+.blocklyResizeSW {
+  cursor: sw-resize;
+  fill: #fc3;
 }
 
-/* Improved Blockly Toolbar Styling */
-.blocklyFlyout {
-  background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%) !important;
-  border-right: 2px solid #dee2e6 !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  padding: 8px !important;
+.blocklyResizeNE {
+  cursor: ne-resize;
+  fill: #fc3;
 }
 
-/* Category labels styling */
-.blockly-category-label {
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: #4f46e5 !important;
-  padding: 8px 12px !important;
-  margin: 4px 0 !important;
-  background: rgba(79, 70, 229, 0.1) !important;
-  border-radius: 6px !important;
-  display: block !important;
+.blocklyResizeNW {
+  cursor: nw-resize;
+  fill: #fc3;
 }
 
-/* Block spacing in toolbar */
-.blocklyFlyout .blocklyBlockCanvas {
-  margin: 4px 0 !important;
+.blocklyPath {
+  stroke-linecap: round;
+  stroke-width: 1;
+  stroke: #c6c6c6;
 }
 
-/* Separator styling */
-.blocklyFlyout .blocklyFlyoutSeparator {
-  height: 12px !important;
-  background: transparent !important;
+.blocklyPathDark {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 2;
+  stroke: #a6a6a6;
+}
+
+.blocklyPathLight {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 1;
+}
+
+.blocklySelected > .blocklyPath {
+  stroke: #fc3;
+  stroke-width: 2px;
+}
+
+.blocklyDragging > .blocklyPath,
+.blocklyDragging > .blocklyPathLight {
+  fill-opacity: 0.8;
+  stroke-opacity: 0.8;
+}
+
+.blocklyResizeSE {
+  cursor: se-resize;
+  fill: #fc3;
+}
+
+.blocklyResizeSW {
+  cursor: sw-resize;
+  fill: #fc3;
+}
+
+.blocklyResizeNE {
+  cursor: ne-resize;
+  fill: #fc3;
+}
+
+.blocklyResizeNW {
+  cursor: nw-resize;
+  fill: #fc3;
 }
