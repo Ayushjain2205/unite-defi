@@ -20,20 +20,24 @@ const defineCustomBlocks = () => {
 
   console.log("Defining custom blocks...");
 
-  // Trading condition block
+  // Advanced trading blocks
   Blockly.defineBlocksWithJsonArray([
     {
-      type: "trading_condition",
-      message0: "When %1 %2 %3",
+      type: "technical_indicator",
+      message0: "When %1 %2 %3 %4",
       args0: [
         {
           type: "field_dropdown",
           name: "INDICATOR",
           options: [
             ["RSI", "RSI"],
-            ["Price", "PRICE"],
+            ["MACD", "MACD"],
+            ["Bollinger Bands", "BOLLINGER"],
+            ["Moving Average", "MA"],
+            ["Stochastic", "STOCH"],
             ["Volume", "VOLUME"],
-            ["Gas Fee", "GAS"],
+            ["Price Action", "PRICE_ACTION"],
+            ["Support/Resistance", "S_R"],
           ],
         },
         {
@@ -43,6 +47,9 @@ const defineCustomBlocks = () => {
             ["<", "LT"],
             [">", "GT"],
             ["=", "EQ"],
+            ["Crosses Above", "CROSS_ABOVE"],
+            ["Crosses Below", "CROSS_BELOW"],
+            ["Between", "BETWEEN"],
           ],
         },
         {
@@ -50,15 +57,27 @@ const defineCustomBlocks = () => {
           name: "VALUE",
           check: "Number",
         },
+        {
+          type: "field_dropdown",
+          name: "TIMEFRAME",
+          options: [
+            ["1m", "1m"],
+            ["5m", "5m"],
+            ["15m", "15m"],
+            ["1h", "1h"],
+            ["4h", "4h"],
+            ["1d", "1d"],
+          ],
+        },
       ],
       inputsInline: true,
       output: "Boolean",
-      colour: 210,
-      tooltip: "Trading condition trigger",
+      colour: "#FF6B6B",
+      tooltip: "Technical indicator condition",
     },
     {
       type: "trading_action",
-      message0: "%1 %2 of %3",
+      message0: "%1 %2 %3 of %4",
       args0: [
         {
           type: "field_dropdown",
@@ -66,6 +85,20 @@ const defineCustomBlocks = () => {
           options: [
             ["Buy", "BUY"],
             ["Sell", "SELL"],
+            ["Buy Long", "BUY_LONG"],
+            ["Sell Short", "SELL_SHORT"],
+            ["Close Position", "CLOSE"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "ORDER_TYPE",
+          options: [
+            ["Market", "MARKET"],
+            ["Limit", "LIMIT"],
+            ["Stop Loss", "STOP_LOSS"],
+            ["Take Profit", "TAKE_PROFIT"],
+            ["Trailing Stop", "TRAILING_STOP"],
           ],
         },
         {
@@ -77,16 +110,21 @@ const defineCustomBlocks = () => {
           type: "field_dropdown",
           name: "ASSET",
           options: [
-            ["ETH", "ETH"],
-            ["BTC", "BTC"],
-            ["SOL", "SOL"],
+            ["BTC/USDT", "BTC_USDT"],
+            ["ETH/USDT", "ETH_USDT"],
+            ["SOL/USDT", "SOL_USDT"],
+            ["ADA/USDT", "ADA_USDT"],
+            ["DOT/USDT", "DOT_USDT"],
+            ["LINK/USDT", "LINK_USDT"],
+            ["MATIC/USDT", "MATIC_USDT"],
+            ["AVAX/USDT", "AVAX_USDT"],
           ],
         },
       ],
       inputsInline: true,
       previousStatement: null,
       nextStatement: null,
-      colour: 120,
+      colour: "#4ECDC4",
       tooltip: "Execute trading action",
     },
     {
@@ -102,16 +140,416 @@ const defineCustomBlocks = () => {
           text: "Execute:",
         },
       ],
-      colour: 160,
+      colour: "#45B7D1",
       tooltip: "Entry point for trading strategy",
       deletable: false,
+    },
+    {
+      type: "risk_management",
+      message0: "Risk Management %1 %2 %3",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "RISK_TYPE",
+          options: [
+            ["Max Position Size", "MAX_POSITION"],
+            ["Stop Loss", "STOP_LOSS"],
+            ["Take Profit", "TAKE_PROFIT"],
+            ["Max Daily Loss", "MAX_DAILY_LOSS"],
+            ["Max Portfolio Risk", "MAX_PORTFOLIO_RISK"],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "PERCENTAGE",
+          check: "Number",
+        },
+        {
+          type: "field_label",
+          text: "% of portfolio",
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#FF9F43",
+      tooltip: "Risk management settings",
+    },
+    {
+      type: "portfolio_balance",
+      message0: "Portfolio Balance %1 %2",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "BALANCE_TYPE",
+          options: [
+            ["Total Value", "TOTAL_VALUE"],
+            ["Available Balance", "AVAILABLE"],
+            ["Position Value", "POSITION_VALUE"],
+            ["Unrealized P&L", "UNREALIZED_PNL"],
+            ["Realized P&L", "REALIZED_PNL"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "ASSET",
+          options: [
+            ["USDT", "USDT"],
+            ["BTC", "BTC"],
+            ["ETH", "ETH"],
+            ["All Assets", "ALL"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      output: "Number",
+      colour: "#A55EEA",
+      tooltip: "Get portfolio balance information",
+    },
+    {
+      type: "market_data",
+      message0: "Market Data %1 %2 %3",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "DATA_TYPE",
+          options: [
+            ["Current Price", "PRICE"],
+            ["24h Change", "24H_CHANGE"],
+            ["24h Volume", "24H_VOLUME"],
+            ["Market Cap", "MARKET_CAP"],
+            ["Fear & Greed Index", "FEAR_GREED"],
+            ["Funding Rate", "FUNDING_RATE"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "ASSET",
+          options: [
+            ["BTC/USDT", "BTC_USDT"],
+            ["ETH/USDT", "ETH_USDT"],
+            ["SOL/USDT", "SOL_USDT"],
+            ["ADA/USDT", "ADA_USDT"],
+            ["DOT/USDT", "DOT_USDT"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "TIMEFRAME",
+          options: [
+            ["1m", "1m"],
+            ["5m", "5m"],
+            ["15m", "15m"],
+            ["1h", "1h"],
+            ["4h", "4h"],
+            ["1d", "1d"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      output: "Number",
+      colour: "#26DE81",
+      tooltip: "Get real-time market data",
+    },
+    {
+      type: "get_price",
+      message0: "Get Price %1 on %2",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "ASSET",
+          options: [
+            ["BTC", "BTC"],
+            ["ETH", "ETH"],
+            ["SOL", "SOL"],
+            ["ADA", "ADA"],
+            ["DOT", "DOT"],
+            ["LINK", "LINK"],
+            ["MATIC", "MATIC"],
+            ["AVAX", "AVAX"],
+            ["UNI", "UNI"],
+            ["AAVE", "AAVE"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "EXCHANGE",
+          options: [
+            ["Binance", "BINANCE"],
+            ["Coinbase", "COINBASE"],
+            ["Kraken", "KRAKEN"],
+            ["KuCoin", "KUCOIN"],
+            ["Bybit", "BYBIT"],
+            ["OKX", "OKX"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      output: "Number",
+      colour: "#00B894",
+      tooltip: "Get current price from exchange",
+    },
+    {
+      type: "blockchain_operation",
+      message0: "%1 %2 on %3",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "OPERATION",
+          options: [
+            ["Send", "SEND"],
+            ["Receive", "RECEIVE"],
+            ["Swap", "SWAP"],
+            ["Bridge", "BRIDGE"],
+            ["Stake", "STAKE"],
+            ["Unstake", "UNSTAKE"],
+            ["Claim Rewards", "CLAIM"],
+            ["Vote", "VOTE"],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "AMOUNT",
+          check: "Number",
+        },
+        {
+          type: "field_dropdown",
+          name: "CHAIN",
+          options: [
+            ["Ethereum", "ETH"],
+            ["Binance Smart Chain", "BSC"],
+            ["Polygon", "POLYGON"],
+            ["Arbitrum", "ARBITRUM"],
+            ["Optimism", "OPTIMISM"],
+            ["Solana", "SOLANA"],
+            ["Avalanche", "AVALANCHE"],
+            ["Cardano", "CARDANO"],
+            ["Polkadot", "POLKADOT"],
+            ["Cosmos", "COSMOS"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#6C5CE7",
+      tooltip: "Blockchain operation",
+    },
+    {
+      type: "defi_operation",
+      message0: "%1 %2 %3 on %4",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "DEFI_ACTION",
+          options: [
+            ["Deposit", "DEPOSIT"],
+            ["Withdraw", "WITHDRAW"],
+            ["Borrow", "BORROW"],
+            ["Repay", "REPAY"],
+            ["Add Liquidity", "ADD_LIQUIDITY"],
+            ["Remove Liquidity", "REMOVE_LIQUIDITY"],
+            ["Stake", "STAKE"],
+            ["Unstake", "UNSTAKE"],
+            ["Claim Rewards", "CLAIM_REWARDS"],
+            ["Harvest", "HARVEST"],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "AMOUNT",
+          check: "Number",
+        },
+        {
+          type: "field_dropdown",
+          name: "TOKEN",
+          options: [
+            ["USDT", "USDT"],
+            ["USDC", "USDC"],
+            ["DAI", "DAI"],
+            ["WETH", "WETH"],
+            ["WBTC", "WBTC"],
+            ["UNI", "UNI"],
+            ["AAVE", "AAVE"],
+            ["CRV", "CRV"],
+            ["COMP", "COMP"],
+            ["SUSHI", "SUSHI"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "PROTOCOL",
+          options: [
+            ["Uniswap", "UNISWAP"],
+            ["SushiSwap", "SUSHISWAP"],
+            ["Aave", "AAVE"],
+            ["Compound", "COMPOUND"],
+            ["Curve", "CURVE"],
+            ["Yearn Finance", "YEARN"],
+            ["Balancer", "BALANCER"],
+            ["1inch", "1INCH"],
+            ["PancakeSwap", "PANCAKESWAP"],
+            ["Trader Joe", "TRADER_JOE"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#FD79A8",
+      tooltip: "DeFi protocol operation",
+    },
+    {
+      type: "swap_operation",
+      message0: "Swap %1 %2 for %3 %4",
+      args0: [
+        {
+          type: "input_value",
+          name: "FROM_AMOUNT",
+          check: "Number",
+        },
+        {
+          type: "field_dropdown",
+          name: "FROM_TOKEN",
+          options: [
+            ["USDT", "USDT"],
+            ["USDC", "USDC"],
+            ["ETH", "ETH"],
+            ["BTC", "BTC"],
+            ["SOL", "SOL"],
+            ["ADA", "ADA"],
+            ["DOT", "DOT"],
+            ["LINK", "LINK"],
+            ["MATIC", "MATIC"],
+            ["AVAX", "AVAX"],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "TO_AMOUNT",
+          check: "Number",
+        },
+        {
+          type: "field_dropdown",
+          name: "TO_TOKEN",
+          options: [
+            ["USDT", "USDT"],
+            ["USDC", "USDC"],
+            ["ETH", "ETH"],
+            ["BTC", "BTC"],
+            ["SOL", "SOL"],
+            ["ADA", "ADA"],
+            ["DOT", "DOT"],
+            ["LINK", "LINK"],
+            ["MATIC", "MATIC"],
+            ["AVAX", "AVAX"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#FDCB6E",
+      tooltip: "Token swap operation",
+    },
+    {
+      type: "staking_operation",
+      message0: "%1 %2 %3 on %4",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "STAKING_ACTION",
+          options: [
+            ["Stake", "STAKE"],
+            ["Unstake", "UNSTAKE"],
+            ["Claim Rewards", "CLAIM"],
+            ["Reinvest", "REINVEST"],
+            ["Delegate", "DELEGATE"],
+            ["Undelegate", "UNDELEGATE"],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "AMOUNT",
+          check: "Number",
+        },
+        {
+          type: "field_dropdown",
+          name: "TOKEN",
+          options: [
+            ["ETH", "ETH"],
+            ["SOL", "SOL"],
+            ["ADA", "ADA"],
+            ["DOT", "DOT"],
+            ["ATOM", "ATOM"],
+            ["MATIC", "MATIC"],
+            ["AVAX", "AVAX"],
+            ["BNB", "BNB"],
+            ["FTM", "FTM"],
+            ["NEAR", "NEAR"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "VALIDATOR",
+          options: [
+            ["Auto Select", "AUTO"],
+            ["Binance", "BINANCE"],
+            ["Coinbase", "COINBASE"],
+            ["Kraken", "KRAKEN"],
+            ["Lido", "LIDO"],
+            ["Rocket Pool", "ROCKET_POOL"],
+            ["Custom Validator", "CUSTOM"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#E17055",
+      tooltip: "Staking operation",
+    },
+    {
+      type: "gas_optimization",
+      message0: "Gas Optimization %1 %2",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "GAS_STRATEGY",
+          options: [
+            ["Low Priority", "LOW"],
+            ["Medium Priority", "MEDIUM"],
+            ["High Priority", "HIGH"],
+            ["Custom Gas Price", "CUSTOM"],
+            ["Wait for Low Gas", "WAIT"],
+            ["Use Layer 2", "L2"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "NETWORK",
+          options: [
+            ["Ethereum", "ETH"],
+            ["Polygon", "POLYGON"],
+            ["Arbitrum", "ARBITRUM"],
+            ["Optimism", "OPTIMISM"],
+            ["BSC", "BSC"],
+            ["Avalanche", "AVALANCHE"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#74B9FF",
+      tooltip: "Gas fee optimization",
     },
   ]);
 
   console.log("Custom blocks defined successfully");
 };
 
-// Simple toolbox configuration
+// Advanced toolbox configuration for crypto trading bots
 const toolbox = {
   kind: "categoryToolbox",
   contents: [
@@ -128,16 +566,20 @@ const toolbox = {
           kind: "block",
           type: "controls_if",
         },
+        {
+          kind: "block",
+          type: "controls_repeat_ext",
+        },
       ],
     },
     {
       kind: "category",
-      name: "📊 Conditions",
-      colour: "#5CA65C",
+      name: "📊 Technical Analysis",
+      colour: "#FF6B6B",
       contents: [
         {
           kind: "block",
-          type: "trading_condition",
+          type: "technical_indicator",
         },
         {
           kind: "block",
@@ -151,8 +593,8 @@ const toolbox = {
     },
     {
       kind: "category",
-      name: "⚡ Actions",
-      colour: "#A65C81",
+      name: "⚡ Trading Actions",
+      colour: "#4ECDC4",
       contents: [
         {
           kind: "block",
@@ -162,7 +604,78 @@ const toolbox = {
     },
     {
       kind: "category",
-      name: "🔢 Math",
+      name: "🛡️ Risk Management",
+      colour: "#FF9F43",
+      contents: [
+        {
+          kind: "block",
+          type: "risk_management",
+        },
+      ],
+    },
+    {
+      kind: "category",
+      name: "💰 Portfolio",
+      colour: "#A55EEA",
+      contents: [
+        {
+          kind: "block",
+          type: "portfolio_balance",
+        },
+        {
+          kind: "block",
+          type: "market_data",
+        },
+        {
+          kind: "block",
+          type: "get_price",
+        },
+      ],
+    },
+    {
+      kind: "category",
+      name: "🔗 Blockchain",
+      colour: "#6C5CE7",
+      contents: [
+        {
+          kind: "block",
+          type: "blockchain_operation",
+        },
+        {
+          kind: "block",
+          type: "gas_optimization",
+        },
+      ],
+    },
+    {
+      kind: "category",
+      name: "🔄 DeFi",
+      colour: "#FD79A8",
+      contents: [
+        {
+          kind: "block",
+          type: "defi_operation",
+        },
+        {
+          kind: "block",
+          type: "swap_operation",
+        },
+      ],
+    },
+    {
+      kind: "category",
+      name: "🔒 Staking",
+      colour: "#E17055",
+      contents: [
+        {
+          kind: "block",
+          type: "staking_operation",
+        },
+      ],
+    },
+    {
+      kind: "category",
+      name: "🔢 Math & Logic",
       colour: "#745CA6",
       contents: [
         {
@@ -173,13 +686,6 @@ const toolbox = {
           kind: "block",
           type: "math_arithmetic",
         },
-      ],
-    },
-    {
-      kind: "category",
-      name: "🔗 Logic",
-      colour: "#A6745C",
-      contents: [
         {
           kind: "block",
           type: "logic_boolean",
@@ -437,6 +943,99 @@ export function BlocklyEditor({
                 .blocklyScrollbarHorizontal { display: none !important; }
                 .blocklyScrollbarVertical { visibility: hidden !important; }
                 .blocklyScrollbarHorizontal { visibility: hidden !important; }
+                
+                /* Custom block styles */
+                .blocklyBlock[data-type="technical_indicator"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3) !important;
+                }
+                
+                .blocklyBlock[data-type="trading_action"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(78, 205, 196, 0.3) !important;
+                }
+                
+                .blocklyBlock[data-type="strategy_start"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(69, 183, 209, 0.3) !important;
+                }
+                
+                .blocklyBlock[data-type="risk_management"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(255, 159, 67, 0.3) !important;
+                }
+                
+                .blocklyBlock[data-type="portfolio_balance"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(165, 94, 234, 0.3) !important;
+                }
+                
+                .blocklyBlock[data-type="market_data"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(38, 222, 129, 0.3) !important;
+                }
+                
+                .blocklyBlock[data-type="get_price"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(0, 184, 148, 0.3) !important;
+                }
+                
+                .blocklyBlock[data-type="blockchain_operation"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(108, 92, 231, 0.3) !important;
+                }
+                
+                .blocklyBlock[data-type="defi_operation"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(253, 121, 168, 0.3) !important;
+                }
+                
+                .blocklyBlock[data-type="swap_operation"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(253, 203, 110, 0.3) !important;
+                }
+                
+                .blocklyBlock[data-type="staking_operation"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(225, 112, 85, 0.3) !important;
+                }
+                
+                .blocklyBlock[data-type="gas_optimization"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(116, 185, 255, 0.3) !important;
+                }
+                
+                /* Hover effects - disabled to prevent oscillation */
+                /* .blocklyBlock:hover {
+                  transform: translateY(-1px) !important;
+                  transition: transform 0.2s ease !important;
+                } */
+                
+                /* Custom fonts for all Blockly text */
+                .blocklyText, .blocklyDropdownText, .blocklyFieldLabel {
+                  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+                  font-weight: 500 !important;
+                  font-size: 14px !important;
+                }
+                
+                /* Make dropdown text more readable */
+                .blocklyDropdownText {
+                  font-weight: 600 !important;
+                  color: #374151 !important;
+                }
+                
+                /* Style the field labels */
+                .blocklyFieldLabel {
+                  font-weight: 600 !important;
+                  color: #6B7280 !important;
+                }
+                
+                /* Custom font for toolbox categories */
+                .blocklyTreeRoot, .blocklyTreeLabel {
+                  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+                  font-weight: 500 !important;
+                  font-size: 14px !important;
+                }
               `,
             }}
           />
