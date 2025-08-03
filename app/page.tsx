@@ -24,6 +24,9 @@ import {
   ArrowRight,
   FileText as Template,
   Edit,
+  Play,
+  Shield,
+  Target,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -65,10 +68,10 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -76,72 +79,66 @@ export default function Home() {
           className="space-y-12"
         >
           {/* Hero Section */}
-          <motion.div variants={itemVariants} className="text-center">
-            <div className="flex justify-center mb-6">
-              <div className="flex gap-2">
-                {["667eea", "f093fb", "4facfe", "43e97b", "fa709a"].map(
-                  (orbId, i) => (
-                    <OrbIcon
-                      key={i}
-                      size="lg"
-                      orbId={orbId}
-                      pulse={i % 2 === 0}
-                    />
-                  )
-                )}
-              </div>
-            </div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Create Your Trading Orb
-            </h2>
-            <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Spin up autonomous trading agents in seconds. Use natural language
-              or choose from proven templates.
-            </p>
-          </motion.div>
+          <div className="h-[calc(100vh-80px)] flex flex-col justify-center relative">
+            <motion.div variants={itemVariants} className="text-center">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+                Create Your Trading Orb
+              </h2>
+              <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+                Spin up autonomous trading agents in seconds. Use natural
+                language or choose from proven templates.
+              </p>
+            </motion.div>
 
-          {/* Main Input Section */}
-          <motion.div variants={itemVariants}>
-            <Card className="max-w-4xl mx-auto border-2 border-gray-200 shadow-lg">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-indigo-600" />
-                  Describe Your Trading Strategy
-                </CardTitle>
-                <CardDescription>
-                  Tell us what you want your Orb to do, and we'll generate the
-                  logic for you.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Textarea
-                  placeholder="Ex: Buy ETH when gas fee drops below 20 gwei and RSI is oversold..."
-                  value={prompt}
-                  onChange={(e) => setPrompt(e.target.value)}
-                  className="min-h-[120px] text-base border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
-                />
-                <div className="flex gap-3">
-                  <Button
-                    onClick={handleGenerateOrb}
-                    disabled={!prompt.trim()}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2 flex items-center gap-2"
-                  >
-                    <Zap className="w-4 h-4" />
-                    Generate Orb
-                    <ArrowRight className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowTemplates(true)}
-                    className="border-gray-300 hover:bg-gray-50 flex items-center gap-2"
-                  >
-                    <Template className="w-4 h-4" />
-                    Use Template
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
+            {/* Main Input Section with Background Orb */}
+            <motion.div variants={itemVariants} className="relative">
+              {/* Background Orb */}
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 0.08 }}
+                transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+              >
+                <OrbIcon size="8xl" orbId="4facfe" />
+              </motion.div>
+
+              <Card className="max-w-4xl mx-auto border-2 border-gray-200 shadow-xl bg-white/90 backdrop-blur-sm relative z-10">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-indigo-600" />
+                    Describe Your Trading Strategy
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Textarea
+                    placeholder="Ex: Buy ETH when gas fee drops below 20 gwei and RSI is oversold..."
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="min-h-[120px] text-base border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={handleGenerateOrb}
+                      disabled={!prompt.trim()}
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2 flex items-center gap-2"
+                    >
+                      <Zap className="w-4 h-4" />
+                      Generate Orb
+                      <ArrowRight className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowTemplates(true)}
+                      className="border-gray-300 hover:bg-gray-50 flex items-center gap-2"
+                    >
+                      <Template className="w-4 h-4" />
+                      Use Template
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
 
           {/* Active Orbs */}
           {orbs.length > 0 && (
@@ -232,7 +229,14 @@ export default function Home() {
       <footer className="border-t border-gray-100 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center text-sm text-gray-600">
-            Built on <span className="font-medium">OrbFi.ai</span>
+            Built by{" "}
+            <a
+              href="https://iyushjain.com"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="font-medium">iyushjain</span>
+            </a>
           </div>
         </div>
       </footer>

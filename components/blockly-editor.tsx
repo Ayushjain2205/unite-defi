@@ -5,6 +5,7 @@ import * as Blockly from "blockly";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Play, RotateCcw, Save } from "lucide-react";
+import { toast } from "sonner";
 
 // Define custom blocks
 const defineCustomBlocks = () => {
@@ -845,7 +846,7 @@ export function BlocklyEditor({
   };
 
   const handleTest = () => {
-    alert(
+    toast.success(
       "Visual editor is working! You can drag and drop blocks to build your strategy."
     );
   };
@@ -861,7 +862,7 @@ export function BlocklyEditor({
     const xmlText = Blockly.Xml.domToText(xml);
     console.log("Manual save - XML length:", xmlText.length);
     // Don't call onWorkspaceChange here to avoid re-renders
-    alert("Workspace saved manually!");
+    toast.success("Workspace saved successfully!");
 
     // Re-enable after a short delay
     setTimeout(() => {
@@ -893,14 +894,6 @@ export function BlocklyEditor({
             <Button variant="outline" size="sm" onClick={handleReset}>
               <RotateCcw className="w-4 h-4 mr-2" />
               Reset
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleTestWorkspaceChange}
-            >
-              <Play className="w-4 h-4 mr-2" />
-              Test WS Change
             </Button>
           </div>
         </div>

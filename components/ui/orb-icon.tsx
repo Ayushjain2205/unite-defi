@@ -4,7 +4,18 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 interface OrbIconProps {
-  size?: "sm" | "md" | "lg" | "xl";
+  size?:
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "2xl"
+    | "3xl"
+    | "4xl"
+    | "5xl"
+    | "6xl"
+    | "7xl"
+    | "8xl";
   orbId?: string; // Hex string for the orb ID
   pulse?: boolean;
   className?: string;
@@ -15,10 +26,30 @@ const sizeClasses = {
   md: "w-12 h-12",
   lg: "w-16 h-16",
   xl: "w-20 h-20",
+  "2xl": "w-32 h-32",
+  "3xl": "w-48 h-48",
+  "4xl": "w-64 h-64",
+  "5xl": "w-96 h-96",
+  "6xl": "w-[512px] h-[512px]",
+  "7xl": "w-[640px] h-[640px]",
+  "8xl": "w-[768px] h-[768px]",
 };
 
 // Function to get explicit size values
-function getSizeValue(size: "sm" | "md" | "lg" | "xl"): {
+function getSizeValue(
+  size:
+    | "sm"
+    | "md"
+    | "lg"
+    | "xl"
+    | "2xl"
+    | "3xl"
+    | "4xl"
+    | "5xl"
+    | "6xl"
+    | "7xl"
+    | "8xl"
+): {
   width: string;
   height: string;
 } {
@@ -27,6 +58,13 @@ function getSizeValue(size: "sm" | "md" | "lg" | "xl"): {
     md: { width: "48px", height: "48px" },
     lg: { width: "64px", height: "64px" },
     xl: { width: "80px", height: "80px" },
+    "2xl": { width: "128px", height: "128px" },
+    "3xl": { width: "192px", height: "192px" },
+    "4xl": { width: "256px", height: "256px" },
+    "5xl": { width: "384px", height: "384px" },
+    "6xl": { width: "512px", height: "512px" },
+    "7xl": { width: "640px", height: "640px" },
+    "8xl": { width: "768px", height: "768px" },
   };
   return sizeMap[size];
 }

@@ -145,20 +145,15 @@ export default function EditOrbPage() {
                   placeholder="Orb Name"
                 />
                 <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <span>Auto-saving</span>
-                  <div
-                    className={`w-2 h-2 rounded-full ${
-                      autoSaveStatus === "saved"
-                        ? "bg-green-500"
-                        : autoSaveStatus === "saving"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                    }`}
-                  />
-                  <span className="capitalize">{autoSaveStatus}</span>
                   <span>
-                    • Last modified:{" "}
-                    {new Date(orb.lastModified).toLocaleString()}
+                    Last modified:{" "}
+                    {new Date(orb.lastModified).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </span>
                 </div>
               </div>
@@ -182,10 +177,6 @@ export default function EditOrbPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button variant="outline" onClick={handleSaveChanges}>
-              <Save className="w-4 h-4 mr-2" />
-              Save Changes
-            </Button>
             <Button
               onClick={handleSaveChanges}
               className="bg-indigo-600 hover:bg-indigo-700"
@@ -196,17 +187,26 @@ export default function EditOrbPage() {
           </div>
         </div>
 
-        {/* Original Prompt Display */}
+        {/* Strategy Prompt */}
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle className="text-lg">Original Strategy Prompt</CardTitle>
-            <CardDescription>
-              Edit your visual strategy based on this description
-            </CardDescription>
+            <CardTitle className="text-lg">Strategy Prompt</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="bg-gray-50 p-4 rounded-lg">
-              <p className="text-gray-700">{orb.prompt}</p>
+              <textarea
+                value={orb.prompt}
+                onChange={(e) => {
+                  if (orb) {
+                    updateOrb(orb.id, {
+                      prompt: e.target.value,
+                    });
+                  }
+                }}
+                className="w-full bg-transparent border-0 p-0 text-gray-700 resize-none focus:ring-0 focus:outline-none"
+                rows={1}
+                placeholder="Enter your strategy description..."
+              />
             </div>
           </CardContent>
         </Card>
