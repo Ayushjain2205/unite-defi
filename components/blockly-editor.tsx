@@ -13,7 +13,14 @@ const defineCustomBlocks = () => {
   if (
     Blockly.Blocks["trading_condition"] &&
     Blockly.Blocks["trading_action"] &&
-    Blockly.Blocks["strategy_start"]
+    Blockly.Blocks["strategy_start"] &&
+    Blockly.Blocks["ai_agent"] &&
+    Blockly.Blocks["ai_agent_config"] &&
+    Blockly.Blocks["ai_prompt"] &&
+    Blockly.Blocks["ai_condition"] &&
+    Blockly.Blocks["ai_data_source"] &&
+    Blockly.Blocks["ai_learning"] &&
+    Blockly.Blocks["ai_optimization"]
   ) {
     console.log("Custom blocks already defined, skipping...");
     return;
@@ -23,6 +30,293 @@ const defineCustomBlocks = () => {
 
   // Advanced trading blocks
   Blockly.defineBlocksWithJsonArray([
+    // AI Agent Blocks
+    {
+      type: "ai_agent",
+      message0: "🤖 AI Agent %1 %2 %3",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "AGENT_TYPE",
+          options: [
+            ["Trading Agent", "TRADING_AGENT"],
+            ["Market Analysis Agent", "MARKET_ANALYSIS"],
+            ["Risk Management Agent", "RISK_MANAGEMENT"],
+            ["Portfolio Optimization Agent", "PORTFOLIO_OPTIMIZATION"],
+            ["Sentiment Analysis Agent", "SENTIMENT_ANALYSIS"],
+            ["News Analysis Agent", "NEWS_ANALYSIS"],
+            ["Technical Analysis Agent", "TECHNICAL_ANALYSIS"],
+            ["Arbitrage Agent", "ARBITRAGE_AGENT"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "MODEL",
+          options: [
+            ["GPT-4", "GPT4"],
+            ["GPT-3.5 Turbo", "GPT35"],
+            ["Claude 3", "CLAUDE3"],
+            ["Claude 3.5 Sonnet", "CLAUDE35"],
+            ["Gemini Pro", "GEMINI_PRO"],
+            ["Llama 3", "LLAMA3"],
+            ["Custom Model", "CUSTOM"],
+          ],
+        },
+        {
+          type: "input_statement",
+          name: "CONFIG",
+        },
+      ],
+      inputsInline: false,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#8B5CF6",
+      tooltip: "AI agent for automated decision making",
+    },
+    {
+      type: "ai_agent_config",
+      message0: "Agent Config %1 %2 %3 %4",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "TEMPERATURE",
+          options: [
+            ["Conservative (0.1)", "0.1"],
+            ["Balanced (0.5)", "0.5"],
+            ["Creative (0.8)", "0.8"],
+            ["Very Creative (1.0)", "1.0"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "MAX_TOKENS",
+          options: [
+            ["Short (256)", "256"],
+            ["Medium (512)", "512"],
+            ["Long (1024)", "1024"],
+            ["Very Long (2048)", "2048"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "STRATEGY",
+          options: [
+            ["Conservative", "CONSERVATIVE"],
+            ["Balanced", "BALANCED"],
+            ["Aggressive", "AGGRESSIVE"],
+            ["Adaptive", "ADAPTIVE"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "UPDATE_FREQUENCY",
+          options: [
+            ["Real-time", "REALTIME"],
+            ["Every 5 minutes", "5MIN"],
+            ["Every 15 minutes", "15MIN"],
+            ["Every hour", "1HOUR"],
+            ["Daily", "DAILY"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#A855F7",
+      tooltip: "Configure AI agent parameters",
+    },
+    {
+      type: "ai_prompt",
+      message0: "📝 AI Prompt %1 %2",
+      args0: [
+        {
+          type: "field_multilinetext",
+          name: "PROMPT_TEXT",
+          text: "Analyze the current market conditions and provide trading recommendations based on technical indicators and market sentiment.",
+        },
+        {
+          type: "field_dropdown",
+          name: "PROMPT_TYPE",
+          options: [
+            ["Trading Decision", "TRADING_DECISION"],
+            ["Market Analysis", "MARKET_ANALYSIS"],
+            ["Risk Assessment", "RISK_ASSESSMENT"],
+            ["Portfolio Review", "PORTFOLIO_REVIEW"],
+            ["News Impact", "NEWS_IMPACT"],
+            ["Technical Analysis", "TECHNICAL_ANALYSIS"],
+            ["Sentiment Analysis", "SENTIMENT_ANALYSIS"],
+            ["Custom", "CUSTOM"],
+          ],
+        },
+      ],
+      inputsInline: false,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#EC4899",
+      tooltip: "Define AI prompt for analysis",
+    },
+    {
+      type: "ai_condition",
+      message0: "🧠 AI Condition %1 %2 %3",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "CONDITION_TYPE",
+          options: [
+            ["Confidence Score", "CONFIDENCE"],
+            ["Sentiment Score", "SENTIMENT"],
+            ["Risk Score", "RISK_SCORE"],
+            ["Market Trend", "MARKET_TREND"],
+            ["Volatility Level", "VOLATILITY"],
+            ["Volume Analysis", "VOLUME_ANALYSIS"],
+            ["Price Movement", "PRICE_MOVEMENT"],
+            ["Custom Metric", "CUSTOM_METRIC"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "OPERATOR",
+          options: [
+            [">", "GT"],
+            ["<", "LT"],
+            ["=", "EQ"],
+            [">=", "GTE"],
+            ["<=", "LTE"],
+            ["Contains", "CONTAINS"],
+            ["Not Contains", "NOT_CONTAINS"],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "THRESHOLD",
+          check: "Number",
+        },
+      ],
+      inputsInline: true,
+      output: "Boolean",
+      colour: "#F59E0B",
+      tooltip: "AI-powered condition checking",
+    },
+    {
+      type: "ai_data_source",
+      message0: "📊 AI Data Source %1 %2",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "DATA_SOURCE",
+          options: [
+            ["Market Data", "MARKET_DATA"],
+            ["News & Sentiment", "NEWS_SENTIMENT"],
+            ["Social Media", "SOCIAL_MEDIA"],
+            ["On-chain Data", "ONCHAIN_DATA"],
+            ["Technical Indicators", "TECHNICAL_INDICATORS"],
+            ["Fundamental Data", "FUNDAMENTAL_DATA"],
+            ["Alternative Data", "ALTERNATIVE_DATA"],
+            ["Custom API", "CUSTOM_API"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "UPDATE_FREQUENCY",
+          options: [
+            ["Real-time", "REALTIME"],
+            ["Every minute", "1MIN"],
+            ["Every 5 minutes", "5MIN"],
+            ["Every 15 minutes", "15MIN"],
+            ["Every hour", "1HOUR"],
+            ["Daily", "DAILY"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#10B981",
+      tooltip: "Data source for AI analysis",
+    },
+    {
+      type: "ai_learning",
+      message0: "🎓 AI Learning %1 %2 %3",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "LEARNING_TYPE",
+          options: [
+            ["Reinforcement Learning", "REINFORCEMENT"],
+            ["Supervised Learning", "SUPERVISED"],
+            ["Unsupervised Learning", "UNSUPERVISED"],
+            ["Online Learning", "ONLINE"],
+            ["Transfer Learning", "TRANSFER"],
+            ["Meta Learning", "META"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "MODEL_TYPE",
+          options: [
+            ["Neural Network", "NEURAL_NETWORK"],
+            ["Decision Tree", "DECISION_TREE"],
+            ["Random Forest", "RANDOM_FOREST"],
+            ["Support Vector Machine", "SVM"],
+            ["Gradient Boosting", "GRADIENT_BOOSTING"],
+            ["Custom Model", "CUSTOM"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "TRAINING_FREQUENCY",
+          options: [
+            ["Continuous", "CONTINUOUS"],
+            ["Daily", "DAILY"],
+            ["Weekly", "WEEKLY"],
+            ["Monthly", "MONTHLY"],
+            ["On Performance Drop", "ON_PERFORMANCE_DROP"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#3B82F6",
+      tooltip: "AI model learning and training",
+    },
+    {
+      type: "ai_optimization",
+      message0: "⚡ AI Optimization %1 %2",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "OPTIMIZATION_TYPE",
+          options: [
+            ["Portfolio Optimization", "PORTFOLIO"],
+            ["Risk Optimization", "RISK"],
+            ["Timing Optimization", "TIMING"],
+            ["Position Sizing", "POSITION_SIZING"],
+            ["Entry/Exit Points", "ENTRY_EXIT"],
+            ["Multi-Strategy", "MULTI_STRATEGY"],
+            ["Parameter Tuning", "PARAMETER_TUNING"],
+            ["Hyperparameter Optimization", "HYPERPARAMETER"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "OPTIMIZATION_METHOD",
+          options: [
+            ["Bayesian Optimization", "BAYESIAN"],
+            ["Genetic Algorithm", "GENETIC"],
+            ["Gradient Descent", "GRADIENT_DESCENT"],
+            ["Grid Search", "GRID_SEARCH"],
+            ["Random Search", "RANDOM_SEARCH"],
+            ["Evolutionary Strategy", "EVOLUTIONARY"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#EF4444",
+      tooltip: "AI-powered strategy optimization",
+    },
     {
       type: "technical_indicator",
       message0: "When %1 %2 %3 %4",
@@ -565,6 +859,34 @@ const toolbox = {
         },
         {
           kind: "block",
+          type: "ai_agent",
+        },
+        {
+          kind: "block",
+          type: "ai_agent_config",
+        },
+        {
+          kind: "block",
+          type: "ai_prompt",
+        },
+        {
+          kind: "block",
+          type: "ai_condition",
+        },
+        {
+          kind: "block",
+          type: "ai_data_source",
+        },
+        {
+          kind: "block",
+          type: "ai_learning",
+        },
+        {
+          kind: "block",
+          type: "ai_optimization",
+        },
+        {
+          kind: "block",
           type: "controls_if",
         },
         {
@@ -980,6 +1302,49 @@ export function BlocklyEditor({
                 .blocklyBlock[data-type="gas_optimization"] {
                   border-radius: 8px !important;
                   box-shadow: 0 2px 4px rgba(116, 185, 255, 0.3) !important;
+                }
+                
+                /* AI Block Styles */
+                .blocklyBlock[data-type="ai_agent"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3) !important;
+                  background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 100%) !important;
+                }
+                
+                .blocklyBlock[data-type="ai_agent_config"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(168, 85, 247, 0.3) !important;
+                  background: linear-gradient(135deg, #A855F7 0%, #C084FC 100%) !important;
+                }
+                
+                .blocklyBlock[data-type="ai_prompt"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(236, 72, 153, 0.3) !important;
+                  background: linear-gradient(135deg, #EC4899 0%, #F472B6 100%) !important;
+                }
+                
+                .blocklyBlock[data-type="ai_condition"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3) !important;
+                  background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%) !important;
+                }
+                
+                .blocklyBlock[data-type="ai_data_source"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3) !important;
+                  background: linear-gradient(135deg, #10B981 0%, #34D399 100%) !important;
+                }
+                
+                .blocklyBlock[data-type="ai_learning"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3) !important;
+                  background: linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%) !important;
+                }
+                
+                .blocklyBlock[data-type="ai_optimization"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3) !important;
+                  background: linear-gradient(135deg, #EF4444 0%, #F87171 100%) !important;
                 }
                 
                 /* Enhanced toolbox/category menu styling */
