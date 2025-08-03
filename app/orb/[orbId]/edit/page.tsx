@@ -56,8 +56,37 @@ export default function EditOrbPage() {
   const [autoSaveStatus, setAutoSaveStatus] = useState<
     "saved" | "saving" | "error"
   >("saved");
+  const [isStoreHydrated, setIsStoreHydrated] = useState(false);
 
   const orb = orbs.find((o) => o.id === orbId);
+
+  // Check if store is hydrated
+  useEffect(() => {
+    const checkHydration = () => {
+      const stored = localStorage.getItem("orbfi-store");
+      if (stored) {
+        try {
+          const data = JSON.parse(stored);
+          console.log("Stored data:", data);
+          if (data.orbs && data.orbs.length > 0) {
+            setIsStoreHydrated(true);
+          }
+        } catch (error) {
+          console.error("Error parsing stored data:", error);
+        }
+      }
+      // Also check if orbs are loaded from the store
+      if (orbs.length > 0) {
+        setIsStoreHydrated(true);
+      }
+    };
+
+    checkHydration();
+
+    // Check again after a short delay to ensure store is fully hydrated
+    const timer = setTimeout(checkHydration, 100);
+    return () => clearTimeout(timer);
+  }, [orbs.length]);
 
   // Auto-save functionality
   useEffect(() => {
@@ -81,15 +110,33 @@ export default function EditOrbPage() {
   }, [currentBlocks, orbName, orb, updateOrb]);
 
   useEffect(() => {
+    console.log(
+      "Edit page useEffect - orb:",
+      orb,
+      "orbs.length:",
+      orbs.length,
+      "orbId:",
+      orbId,
+      "isStoreHydrated:",
+      isStoreHydrated
+    );
+
     if (orb) {
       setOrbName(orb.name);
       setCurrentBlocks(orb.blocks || "");
       setBlocksLoaded(true);
-    } else {
+    } else if (isStoreHydrated && orbs.length > 0) {
+      // If store is hydrated and orbs are loaded but this specific orb is not found
+      console.log("Orb not found, redirecting to /");
+      console.log(
+        "Available orbs:",
+        orbs.map((o) => ({ id: o.id, name: o.name }))
+      );
       toast.error("Orb not found");
       router.push("/");
     }
-  }, [orb, router]);
+    // Don't redirect if store is not hydrated yet
+  }, [orb, orbs.length, router, orbId, isStoreHydrated]);
 
   const handleSaveChanges = () => {
     if (orb) {
@@ -112,8 +159,10 @@ export default function EditOrbPage() {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading orb...</p>
+          <div className="animate-pulse">
+            <OrbIcon size="2xl" orbId={orbId} />
+          </div>
+          <p className="text-gray-600 mt-4">Loading orb...</p>
         </div>
       </div>
     );

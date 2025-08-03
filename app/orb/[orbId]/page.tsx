@@ -39,14 +39,70 @@ export default function OrbPage() {
 
   const { orbs, updateOrb, deleteOrb } = useOrbStore();
   const [timeRange, setTimeRange] = useState<"24h" | "7d">("24h");
+  const [isStoreHydrated, setIsStoreHydrated] = useState(false);
 
   const orb = orbs.find((o) => o.id === orbId);
 
+  // Check if store is hydrated
   useEffect(() => {
-    if (!orb) {
+    const checkHydration = () => {
+      const stored = localStorage.getItem("orbfi-store");
+      if (stored) {
+        try {
+          const data = JSON.parse(stored);
+          console.log("Stored data in orb page:", data);
+          if (data.orbs && data.orbs.length > 0) {
+            setIsStoreHydrated(true);
+          }
+        } catch (error) {
+          console.error("Error parsing stored data:", error);
+        }
+      }
+      // Also check if orbs are loaded from the store
+      if (orbs.length > 0) {
+        setIsStoreHydrated(true);
+      }
+    };
+
+    checkHydration();
+
+    // Check again after a short delay to ensure store is fully hydrated
+    const timer = setTimeout(checkHydration, 100);
+    return () => clearTimeout(timer);
+  }, [orbs.length]);
+
+  useEffect(() => {
+    console.log(
+      "Orb page useEffect - orb:",
+      orb,
+      "orbs.length:",
+      orbs.length,
+      "orbId:",
+      orbId
+    );
+
+    // Check localStorage directly
+    const stored = localStorage.getItem("orbfi-store");
+    if (stored) {
+      try {
+        const data = JSON.parse(stored);
+        console.log("Stored data in orb page:", data);
+      } catch (error) {
+        console.error("Error parsing stored data:", error);
+      }
+    }
+
+    if (!orb && isStoreHydrated && orbs.length > 0) {
+      // Only redirect if store is hydrated and orbs are loaded but this specific orb is not found
+      console.log("Orb not found in main page, redirecting to /");
+      console.log(
+        "Available orbs:",
+        orbs.map((o) => ({ id: o.id, name: o.name }))
+      );
       router.push("/");
     }
-  }, [orb, router]);
+    // Don't redirect if store is not hydrated yet
+  }, [orb, orbs.length, router, orbId, isStoreHydrated]);
 
   const handlePauseResume = () => {
     if (orb) {
@@ -65,7 +121,16 @@ export default function OrbPage() {
   };
 
   if (!orb) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-pulse">
+            <OrbIcon size="2xl" orbId={orbId} />
+          </div>
+          <p className="text-gray-600 mt-4">Loading orb...</p>
+        </div>
+      </div>
+    );
   }
 
   const performanceStats = [
