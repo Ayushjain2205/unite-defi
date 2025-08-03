@@ -68,27 +68,7 @@
   }
 }
 
-/* Orb gradient styles */
-.orb-gradient-1 {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #4c1d95 100%);
-}
-
-.orb-gradient-2 {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #be185d 100%);
-}
-
-.orb-gradient-3 {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 50%, #0369a1 100%);
-}
-
-.orb-gradient-4 {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 50%, #047857 100%);
-}
-
-.orb-gradient-5 {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 50%, #d97706 100%);
-}
-
+/* Orb pulse animation */
 .orb-pulse {
   animation: orb-pulse 2s ease-in-out infinite;
 }
@@ -97,11 +77,11 @@
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
   }
   50% {
     transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(102, 126, 234, 0.6);
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
   }
 }
 

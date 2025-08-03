@@ -191,7 +191,7 @@ export default function BuilderPage() {
               Back
             </Button>
             <div className="flex items-center gap-3">
-              <OrbIcon size="md" gradient={3} />
+              <OrbIcon size="md" orbId="4facfe" />
               <div>
                 <Input
                   value={orbName}

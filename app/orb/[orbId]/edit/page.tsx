@@ -136,10 +136,7 @@ export default function EditOrbPage() {
               Back to Orb
             </Button>
             <div className="flex items-center gap-3">
-              <OrbIcon
-                size="md"
-                gradient={((parseInt(orb.id) % 5) + 1) as 1 | 2 | 3 | 4 | 5}
-              />
+              <OrbIcon size="md" orbId={orb.id} />
               <div>
                 <Input
                   value={orbName}

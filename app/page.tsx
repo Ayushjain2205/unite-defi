@@ -79,14 +79,16 @@ export default function Home() {
           <motion.div variants={itemVariants} className="text-center">
             <div className="flex justify-center mb-6">
               <div className="flex gap-2">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <OrbIcon
-                    key={i}
-                    size="lg"
-                    gradient={i as 1 | 2 | 3 | 4 | 5}
-                    pulse={i % 2 === 0}
-                  />
-                ))}
+                {["667eea", "f093fb", "4facfe", "43e97b", "fa709a"].map(
+                  (orbId, i) => (
+                    <OrbIcon
+                      key={i}
+                      size="lg"
+                      orbId={orbId}
+                      pulse={i % 2 === 0}
+                    />
+                  )
+                )}
               </div>
             </div>
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -161,17 +163,7 @@ export default function Home() {
                       <CardHeader className="pb-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <OrbIcon
-                              size="md"
-                              gradient={
-                                ((parseInt(orb.id) % 5) + 1) as
-                                  | 1
-                                  | 2
-                                  | 3
-                                  | 4
-                                  | 5
-                              }
-                            />
+                            <OrbIcon size="md" orbId={orb.id} />
                             <div>
                               <CardTitle className="text-lg">
                                 {orb.name}

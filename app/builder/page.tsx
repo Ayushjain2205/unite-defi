@@ -138,7 +138,7 @@ export default function VisualBuilderPage() {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3">
-              <OrbIcon size="md" gradient={3} />
+              <OrbIcon size="md" orbId="4facfe" />
               <div>
                 <Input
                   value={orbName}
