@@ -46,8 +46,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error executing swap:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to execute swap", details: error.message },
+      { error: "Failed to execute swap", details: errorMessage },
       { status: 500 }
     );
   }

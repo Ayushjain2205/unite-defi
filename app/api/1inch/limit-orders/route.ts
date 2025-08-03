@@ -51,8 +51,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error creating limit order:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to create limit order", details: error.message },
+      { error: "Failed to create limit order", details: errorMessage },
       { status: 500 }
     );
   }
@@ -85,8 +87,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching limit orders:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to fetch limit orders", details: error.message },
+      { error: "Failed to fetch limit orders", details: errorMessage },
       { status: 500 }
     );
   }
@@ -119,8 +123,10 @@ export async function PUT(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error modifying limit order:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to modify limit order", details: error.message },
+      { error: "Failed to modify limit order", details: errorMessage },
       { status: 500 }
     );
   }
@@ -151,8 +157,10 @@ export async function DELETE(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error cancelling limit order:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to cancel limit order", details: error.message },
+      { error: "Failed to cancel limit order", details: errorMessage },
       { status: 500 }
     );
   }

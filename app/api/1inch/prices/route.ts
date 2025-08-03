@@ -32,8 +32,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching token price:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to fetch token price", details: error.message },
+      { error: "Failed to fetch token price", details: errorMessage },
       { status: 500 }
     );
   }
@@ -64,8 +66,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching multiple token prices:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to fetch token prices", details: error.message },
+      { error: "Failed to fetch token prices", details: errorMessage },
       { status: 500 }
     );
   }

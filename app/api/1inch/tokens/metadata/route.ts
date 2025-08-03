@@ -30,8 +30,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching token metadata:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to fetch token metadata", details: error.message },
+      { error: "Failed to fetch token metadata", details: errorMessage },
       { status: 500 }
     );
   }
@@ -61,8 +63,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching multiple token metadata:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to fetch token metadata", details: error.message },
+      { error: "Failed to fetch token metadata", details: errorMessage },
       { status: 500 }
     );
   }

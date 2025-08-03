@@ -30,8 +30,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching token info:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to fetch token info", details: error.message },
+      { error: "Failed to fetch token info", details: errorMessage },
       { status: 500 }
     );
   }
@@ -64,8 +66,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error getting quote:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to get quote", details: error.message },
+      { error: "Failed to get quote", details: errorMessage },
       { status: 500 }
     );
   }

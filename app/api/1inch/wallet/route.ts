@@ -30,8 +30,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching wallet balances:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to fetch wallet balances", details: error.message },
+      { error: "Failed to fetch wallet balances", details: errorMessage },
       { status: 500 }
     );
   }
@@ -62,8 +64,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching token balances:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
     return NextResponse.json(
-      { error: "Failed to fetch token balances", details: error.message },
+      { error: "Failed to fetch token balances", details: errorMessage },
       { status: 500 }
     );
   }
