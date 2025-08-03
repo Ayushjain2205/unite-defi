@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -29,53 +30,56 @@ export function TemplatesModal({
   onSelectTemplate,
 }: TemplatesModalProps) {
   const templatesByCategory = getTemplatesByCategory();
+  const allTemplates = Object.values(templatesByCategory).flat();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-7xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold">Choose a Strategy Template</DialogTitle>
+          <DialogTitle className="text-xl font-bold">
+            Choose a Strategy Template
+          </DialogTitle>
         </DialogHeader>
-        
-        <div className="space-y-6">
-          {Object.entries(templatesByCategory).map(([category, templates]) => (
-            <div key={category}>
-              <h3 className="text-lg font-semibold mb-3 text-gray-700">{category}</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {templates.map(template => (
-                  <Card 
-                    key={template.id} 
-                    className="cursor-pointer hover:shadow-md transition-shadow duration-200 border-gray-200"
-                    onClick={() => {
-                      onSelectTemplate(template);
-                      onOpenChange(false);
-                    }}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {allTemplates.map((template) => (
+            <Card
+              key={template.id}
+              className="cursor-pointer hover:shadow-md transition-shadow duration-200 border-gray-200"
+              onClick={() => {
+                onSelectTemplate(template);
+                onOpenChange(false);
+              }}
+            >
+              <CardHeader className="pb-2">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-indigo-100 rounded-md text-indigo-600">
+                      {template.icon}
+                    </div>
+                    <div>
+                      <CardTitle className="text-sm font-medium">
+                        {template.name}
+                      </CardTitle>
+                    </div>
+                  </div>
+                  <Badge
+                    variant="secondary"
+                    className="text-xs px-2 py-1 bg-gray-100 text-gray-700"
                   >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-indigo-100 rounded-lg text-indigo-600">
-                          {template.icon}
-                        </div>
-                        <div>
-                          <CardTitle className="text-base">{template.name}</CardTitle>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <CardDescription className="text-sm text-gray-600 mb-3">
-                        {template.description}
-                      </CardDescription>
-                      <div className="bg-gray-50 p-3 rounded-md">
-                        <code className="text-xs text-gray-700">{template.prompt}</code>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
+                    {template.category}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0 pb-3">
+                <CardDescription className="text-xs text-gray-600 line-clamp-3">
+                  {template.description}
+                </CardDescription>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </DialogContent>
     </Dialog>
   );
-} 
+}

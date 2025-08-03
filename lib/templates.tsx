@@ -6,6 +6,7 @@ import {
   Target,
   Zap,
   BarChart3,
+  Shield,
 } from "lucide-react";
 
 export interface Template {
@@ -443,6 +444,215 @@ export const TEMPLATE_REGISTRY: Record<string, Template> = {
               </block>
             </value>
             <field name="ASSET">BTC_USDT</field>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>`,
+  },
+  "ai-sentiment-trader": {
+    id: "ai-sentiment-trader",
+    name: "AI Sentiment Trader",
+    description: "Trade based on social media and news sentiment analysis",
+    prompt:
+      "Use AI to analyze social media sentiment and news headlines to predict price movements",
+    icon: <TrendingUp className="w-5 h-5" />,
+    category: "AI",
+    blocklyXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="strategy_start" x="200" y="100">
+    <statement name="DO">
+      <block type="ai_agent" x="200" y="200">
+        <field name="AGENT_TYPE">SENTIMENT_ANALYSIS</field>
+        <field name="MODEL">CLAUDE35</field>
+        <statement name="CONFIG">
+          <block type="ai_agent_config" x="200" y="300">
+            <field name="TEMPERATURE">0.3</field>
+            <field name="MAX_TOKENS">2048</field>
+            <field name="STRATEGY">CONSERVATIVE</field>
+            <field name="UPDATE_FREQUENCY">5MIN</field>
+          </block>
+          <block type="ai_prompt" x="200" y="400">
+            <field name="PROMPT_TEXT">Analyze real-time social media sentiment from Twitter, Reddit, and Telegram channels. Monitor news headlines from major crypto publications. Calculate sentiment score and predict short-term price movements. Execute trades when sentiment score exceeds 80% confidence.</field>
+            <field name="PROMPT_TYPE">SENTIMENT_ANALYSIS</field>
+          </block>
+          <block type="ai_data_source" x="200" y="500">
+            <field name="DATA_SOURCE">NEWS_SENTIMENT</field>
+            <field name="UPDATE_FREQUENCY">1MIN</field>
+          </block>
+          <block type="ai_condition" x="200" y="600">
+            <field name="CONDITION_TYPE">SENTIMENT</field>
+            <field name="OPERATOR">GT</field>
+            <value name="THRESHOLD">
+              <block type="math_number" x="200" y="650">
+                <field name="NUM">80</field>
+              </block>
+            </value>
+          </block>
+          <block type="trading_action" x="200" y="700">
+            <field name="ACTION">BUY</field>
+            <field name="ORDER_TYPE">MARKET</field>
+            <value name="AMOUNT">
+              <block type="math_number" x="200" y="750">
+                <field name="NUM">150</field>
+              </block>
+            </value>
+            <field name="ASSET">ETH_USDT</field>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>`,
+  },
+  "ai-portfolio-optimizer": {
+    id: "ai-portfolio-optimizer",
+    name: "AI Portfolio Optimizer",
+    description: "AI-powered portfolio rebalancing and optimization",
+    prompt:
+      "Use AI to continuously optimize portfolio allocation based on market conditions and risk tolerance",
+    icon: <BarChart3 className="w-5 h-5" />,
+    category: "AI",
+    blocklyXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="strategy_start" x="200" y="100">
+    <statement name="DO">
+      <block type="ai_agent" x="200" y="200">
+        <field name="AGENT_TYPE">PORTFOLIO_OPTIMIZATION</field>
+        <field name="MODEL">GPT4</field>
+        <statement name="CONFIG">
+          <block type="ai_agent_config" x="200" y="300">
+            <field name="TEMPERATURE">0.2</field>
+            <field name="MAX_TOKENS">2048</field>
+            <field name="STRATEGY">CONSERVATIVE</field>
+            <field name="UPDATE_FREQUENCY">1HOUR</field>
+          </block>
+          <block type="ai_prompt" x="200" y="400">
+            <field name="PROMPT_TEXT">Analyze current portfolio allocation, market volatility, correlation between assets, and risk metrics. Optimize portfolio weights using modern portfolio theory. Rebalance when allocation drifts more than 5% from target.</field>
+            <field name="PROMPT_TYPE">PORTFOLIO_REVIEW</field>
+          </block>
+          <block type="ai_data_source" x="200" y="500">
+            <field name="DATA_SOURCE">MARKET_DATA</field>
+            <field name="UPDATE_FREQUENCY">15MIN</field>
+          </block>
+          <block type="ai_optimization" x="200" y="600">
+            <field name="OPTIMIZATION_TYPE">PORTFOLIO</field>
+            <field name="OPTIMIZATION_METHOD">BAYESIAN</field>
+          </block>
+          <block type="trading_action" x="200" y="700">
+            <field name="ACTION">BUY</field>
+            <field name="ORDER_TYPE">MARKET</field>
+            <value name="AMOUNT">
+              <block type="math_number" x="200" y="750">
+                <field name="NUM">200</field>
+              </block>
+            </value>
+            <field name="ASSET">BTC_USDT</field>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>`,
+  },
+  "ai-risk-manager": {
+    id: "ai-risk-manager",
+    name: "AI Risk Manager",
+    description: "AI-powered risk assessment and position sizing",
+    prompt:
+      "Use AI to dynamically assess market risk and adjust position sizes accordingly",
+    icon: <Shield className="w-5 h-5" />,
+    category: "AI",
+    blocklyXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="strategy_start" x="200" y="100">
+    <statement name="DO">
+      <block type="ai_agent" x="200" y="200">
+        <field name="AGENT_TYPE">RISK_MANAGEMENT</field>
+        <field name="MODEL">CLAUDE35</field>
+        <statement name="CONFIG">
+          <block type="ai_agent_config" x="200" y="300">
+            <field name="TEMPERATURE">0.1</field>
+            <field name="MAX_TOKENS">1024</field>
+            <field name="STRATEGY">CONSERVATIVE</field>
+            <field name="UPDATE_FREQUENCY">5MIN</field>
+          </block>
+          <block type="ai_prompt" x="200" y="400">
+            <field name="PROMPT_TEXT">Analyze market volatility, VaR (Value at Risk), maximum drawdown, and correlation risk. Calculate optimal position sizes based on current market conditions. Reduce exposure when risk metrics exceed thresholds.</field>
+            <field name="PROMPT_TYPE">RISK_ASSESSMENT</field>
+          </block>
+          <block type="ai_data_source" x="200" y="500">
+            <field name="DATA_SOURCE">MARKET_DATA</field>
+            <field name="UPDATE_FREQUENCY">1MIN</field>
+          </block>
+          <block type="ai_condition" x="200" y="600">
+            <field name="CONDITION_TYPE">RISK_SCORE</field>
+            <field name="OPERATOR">LT</field>
+            <value name="THRESHOLD">
+              <block type="math_number" x="200" y="650">
+                <field name="NUM">30</field>
+              </block>
+            </value>
+          </block>
+          <block type="risk_management" x="200" y="700">
+            <field name="RISK_TYPE">MAX_POSITION</field>
+            <value name="PERCENTAGE">
+              <block type="math_number" x="200" y="750">
+                <field name="NUM">5</field>
+              </block>
+            </value>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>`,
+  },
+  "ai-news-trader": {
+    id: "ai-news-trader",
+    name: "AI News Trader",
+    description: "Trade based on real-time news analysis and impact assessment",
+    prompt:
+      "Use AI to analyze breaking news and predict immediate market reactions",
+    icon: <Target className="w-5 h-5" />,
+    category: "AI",
+    blocklyXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="strategy_start" x="200" y="100">
+    <statement name="DO">
+      <block type="ai_agent" x="200" y="200">
+        <field name="AGENT_TYPE">NEWS_ANALYSIS</field>
+        <field name="MODEL">GPT4</field>
+        <statement name="CONFIG">
+          <block type="ai_agent_config" x="200" y="300">
+            <field name="TEMPERATURE">0.4</field>
+            <field name="MAX_TOKENS">2048</field>
+            <field name="STRATEGY">BALANCED</field>
+            <field name="UPDATE_FREQUENCY">1MIN</field>
+          </block>
+          <block type="ai_prompt" x="200" y="400">
+            <field name="PROMPT_TEXT">Monitor real-time news from major crypto publications, regulatory announcements, and market-moving events. Analyze news sentiment and predict immediate price impact. Execute trades within 30 seconds of significant news.</field>
+            <field name="PROMPT_TYPE">NEWS_IMPACT</field>
+          </block>
+          <block type="ai_data_source" x="200" y="500">
+            <field name="DATA_SOURCE">NEWS_SENTIMENT</field>
+            <field name="UPDATE_FREQUENCY">30SEC</field>
+          </block>
+          <block type="ai_condition" x="200" y="600">
+            <field name="CONDITION_TYPE">CONFIDENCE</field>
+            <field name="OPERATOR">GT</field>
+            <value name="THRESHOLD">
+              <block type="math_number" x="200" y="650">
+                <field name="NUM">85</field>
+              </block>
+            </value>
+          </block>
+          <block type="trading_action" x="200" y="700">
+            <field name="ACTION">BUY</field>
+            <field name="ORDER_TYPE">MARKET</field>
+            <value name="AMOUNT">
+              <block type="math_number" x="200" y="750">
+                <field name="NUM">300</field>
+              </block>
+            </value>
+            <field name="ASSET">SOL_USDT</field>
           </block>
         </statement>
       </block>
