@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { OrbIcon } from "@/components/ui/orb-icon";
 import { useOrbStore } from "@/lib/store";
+import { ConnectButton } from "thirdweb/react";
+import { client } from "@/lib/client";
+import { sepolia } from "thirdweb/chains";
 
 export function Navbar() {
   const router = useRouter();
@@ -34,9 +37,7 @@ export function Navbar() {
             <Badge variant="secondary" className="bg-green-100 text-green-800">
               {orbs.length} Active Orbs
             </Badge>
-            <Button variant="outline" onClick={handleHomeClick}>
-              Create Orb
-            </Button>
+            <ConnectButton client={client} chain={sepolia} />
           </div>
         </div>
       </div>

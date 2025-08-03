@@ -527,4 +527,170 @@ export class OneInchService {
       throw new Error(`Failed to execute swap: ${error.message}`);
     }
   }
+
+  // Wallet and Token Balance Methods
+  async getWalletBalances(params: {
+    walletAddress: string;
+    chainId: number;
+    tokenAddress?: string;
+  }) {
+    try {
+      const { walletAddress, chainId, tokenAddress } = params;
+
+      if (tokenAddress) {
+        // Get balance for specific token
+        const response = await this.makeRequest(
+          `/balance/v1.2/${chainId}/balance?walletAddress=${walletAddress}&tokenAddresses=${tokenAddress}`
+        );
+        return response;
+      } else {
+        // Get all token balances for wallet
+        const response = await this.makeRequest(
+          `/balance/v1.2/${chainId}/balance?walletAddress=${walletAddress}`
+        );
+        return response;
+      }
+    } catch (error) {
+      console.error("Error getting wallet balances:", error);
+      throw new Error(`Failed to get wallet balances: ${error.message}`);
+    }
+  }
+
+  async getTokenBalances(params: {
+    walletAddress: string;
+    chainId: number;
+    tokenAddresses: string[];
+  }) {
+    try {
+      const { walletAddress, chainId, tokenAddresses } = params;
+
+      const response = await this.makeRequest(
+        `/balance/v1.2/${chainId}/balance?walletAddress=${walletAddress}&tokenAddresses=${tokenAddresses.join(
+          ","
+        )}`
+      );
+
+      return response;
+    } catch (error) {
+      console.error("Error getting token balances:", error);
+      throw new Error(`Failed to get token balances: ${error.message}`);
+    }
+  }
+
+  async getTokenMetadata(params: {
+    chainId: number;
+    tokenAddress?: string;
+    tokenSymbol?: string;
+  }) {
+    try {
+      const { chainId, tokenAddress, tokenSymbol } = params;
+
+      if (tokenAddress) {
+        // Get metadata by token address
+        const response = await this.makeRequest(
+          `/tokens/v1.2/${chainId}/tokens/${tokenAddress}`
+        );
+        return response;
+      } else if (tokenSymbol) {
+        // Get metadata by token symbol
+        const response = await this.makeRequest(
+          `/tokens/v1.2/${chainId}/tokens?symbol=${tokenSymbol}`
+        );
+        return response.tokens?.[0] || null;
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error getting token metadata:", error);
+      throw new Error(`Failed to get token metadata: ${error.message}`);
+    }
+  }
+
+  async getMultipleTokenMetadata(params: {
+    chainId: number;
+    tokenAddresses: string[];
+  }) {
+    try {
+      const { chainId, tokenAddresses } = params;
+
+      const metadataPromises = tokenAddresses.map(async (address) => {
+        try {
+          return await this.getTokenMetadata({
+            chainId,
+            tokenAddress: address,
+          });
+        } catch (error) {
+          console.error(`Error getting metadata for ${address}:`, error);
+          return null;
+        }
+      });
+
+      const results = await Promise.all(metadataPromises);
+      return results.filter(Boolean);
+    } catch (error) {
+      console.error("Error getting multiple token metadata:", error);
+      throw new Error(
+        `Failed to get multiple token metadata: ${error.message}`
+      );
+    }
+  }
+
+  async getTokenPrice(params: {
+    chainId: number;
+    tokenAddress?: string;
+    tokenSymbol?: string;
+    currency?: string;
+  }) {
+    try {
+      const { chainId, tokenAddress, tokenSymbol, currency = "USD" } = params;
+
+      if (tokenAddress) {
+        // Get price by token address
+        const response = await this.makeRequest(
+          `/price/v1.1/${chainId}/price?tokenAddress=${tokenAddress}&currency=${currency}`
+        );
+        return response;
+      } else if (tokenSymbol) {
+        // Get price by token symbol
+        const response = await this.makeRequest(
+          `/price/v1.1/${chainId}/price?symbol=${tokenSymbol}&currency=${currency}`
+        );
+        return response;
+      }
+
+      return null;
+    } catch (error) {
+      console.error("Error getting token price:", error);
+      throw new Error(`Failed to get token price: ${error.message}`);
+    }
+  }
+
+  async getMultipleTokenPrices(params: {
+    chainId: number;
+    tokenAddresses: string[];
+    currency?: string;
+  }) {
+    try {
+      const { chainId, tokenAddresses, currency = "USD" } = params;
+
+      const pricePromises = tokenAddresses.map(async (address) => {
+        try {
+          return await this.getTokenPrice({
+            chainId,
+            tokenAddress: address,
+            currency,
+          });
+        } catch (error) {
+          console.error(`Error getting price for ${address}:`, error);
+          return null;
+        }
+      });
+
+      const results = await Promise.all(pricePromises);
+      return results.filter(Boolean);
+    } catch (error) {
+      console.error("Error getting multiple token prices:", error);
+      throw new Error(`Failed to get multiple token prices: ${error.message}`);
+    }
+  }
 }

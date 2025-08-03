@@ -11,7 +11,6 @@
   "dependencies": {
     "@1inch/fusion-sdk": "^2.3.6",
     "@1inch/limit-order-sdk": "^5.0.4-rc.0",
-    "ethers": "^5.7.2",
     "@hookform/resolvers": "^3.9.0",
     "@next/swc-wasm-nodejs": "13.5.1",
     "@radix-ui/react-accordion": "^1.2.0",
@@ -54,6 +53,7 @@
     "embla-carousel-react": "^8.3.0",
     "eslint": "8.49.0",
     "eslint-config-next": "13.5.1",
+    "ethers": "^5.7.2",
     "framer-motion": "^12.23.12",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.446.0",
@@ -70,6 +70,7 @@
     "tailwind-merge": "^2.5.2",
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
+    "thirdweb": "^5.105.26",
     "typescript": "5.2.2",
     "utf-8-validate": "^6.0.5",
     "vaul": "^0.9.9",

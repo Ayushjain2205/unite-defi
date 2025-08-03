@@ -46,6 +46,31 @@ export interface SwapParams {
   deadline?: number;
 }
 
+export interface WalletBalanceParams {
+  walletAddress: string;
+  chainId?: number;
+  tokenAddress?: string;
+}
+
+export interface TokenBalanceParams {
+  walletAddress: string;
+  chainId?: number;
+  tokenAddresses: string[];
+}
+
+export interface TokenMetadataParams {
+  chainId?: number;
+  tokenAddress?: string;
+  tokenSymbol?: string;
+}
+
+export interface TokenPriceParams {
+  chainId?: number;
+  tokenAddress?: string;
+  tokenSymbol?: string;
+  currency?: string;
+}
+
 export function use1Inch() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -290,6 +315,196 @@ export function use1Inch() {
     []
   );
 
+  // Wallet and Token Methods
+  const getWalletBalances = useCallback(async (params: WalletBalanceParams) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const queryParams = new URLSearchParams({
+        walletAddress: params.walletAddress,
+        chainId: (params.chainId || 1).toString(),
+        ...(params.tokenAddress && { tokenAddress: params.tokenAddress }),
+      });
+
+      const response = await fetch(`/api/1inch/wallet?${queryParams}`);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to get wallet balances");
+      }
+
+      return data.balances;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const getTokenBalances = useCallback(async (params: TokenBalanceParams) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/1inch/wallet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to get token balances");
+      }
+
+      return data.tokenBalances;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const getTokenMetadata = useCallback(async (params: TokenMetadataParams) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const queryParams = new URLSearchParams({
+        chainId: (params.chainId || 1).toString(),
+        ...(params.tokenAddress && { tokenAddress: params.tokenAddress }),
+        ...(params.tokenSymbol && { tokenSymbol: params.tokenSymbol }),
+      });
+
+      const response = await fetch(`/api/1inch/tokens/metadata?${queryParams}`);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to get token metadata");
+      }
+
+      return data.metadata;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const getMultipleTokenMetadata = useCallback(
+    async (chainId: number, tokenAddresses: string[]) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch("/api/1inch/tokens/metadata", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ chainId, tokenAddresses }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.error || "Failed to get multiple token metadata"
+          );
+        }
+
+        return data.metadata;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  const getTokenPrice = useCallback(async (params: TokenPriceParams) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const queryParams = new URLSearchParams({
+        chainId: (params.chainId || 1).toString(),
+        currency: params.currency || "USD",
+        ...(params.tokenAddress && { tokenAddress: params.tokenAddress }),
+        ...(params.tokenSymbol && { tokenSymbol: params.tokenSymbol }),
+      });
+
+      const response = await fetch(`/api/1inch/prices?${queryParams}`);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to get token price");
+      }
+
+      return data.price;
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      setError(errorMessage);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const getMultipleTokenPrices = useCallback(
+    async (
+      chainId: number,
+      tokenAddresses: string[],
+      currency: string = "USD"
+    ) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch("/api/1inch/prices", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ chainId, tokenAddresses, currency }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to get multiple token prices");
+        }
+
+        return data.prices;
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "Unknown error";
+        setError(errorMessage);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
   return {
     loading,
     error,
@@ -300,5 +515,11 @@ export function use1Inch() {
     getQuote,
     executeSwap,
     getTokenInfo,
+    getWalletBalances,
+    getTokenBalances,
+    getTokenMetadata,
+    getMultipleTokenMetadata,
+    getTokenPrice,
+    getMultipleTokenPrices,
   };
 }
