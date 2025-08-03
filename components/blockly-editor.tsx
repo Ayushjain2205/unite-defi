@@ -711,13 +711,13 @@ export function BlocklyEditor({
   onCodeGenerate,
 }: BlocklyEditorProps) {
   const blocklyDiv = useRef<HTMLDivElement>(null);
-  const [workspace, setWorkspace] = useState<Blockly.WorkspaceSvg | null>(null);
+  const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isManualOperationRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
-  const isInitializing = useRef(true);
 
   const handleWorkspaceChange = useCallback(() => {
-    if (!workspace || isInitializing.current) return;
+    if (!workspaceRef.current || isManualOperationRef.current) return;
 
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -725,14 +725,20 @@ export function BlocklyEditor({
 
     timeoutRef.current = setTimeout(() => {
       try {
+        const workspace = workspaceRef.current;
+        if (!workspace || isManualOperationRef.current) return;
         const xml = Blockly.Xml.workspaceToDom(workspace);
         const xmlString = Blockly.Xml.domToText(xml);
-        onWorkspaceChange?.(xmlString);
+        // Only call onWorkspaceChange if the XML is not empty
+        if (xmlString.length > 61) {
+          // 61 is the length of empty XML
+          onWorkspaceChange?.(xmlString);
+        }
       } catch (error) {
         console.error("Error in workspace change handler:", error);
       }
-    }, 300);
-  }, [workspace, onWorkspaceChange]);
+    }, 500); // Increased timeout to reduce frequency
+  }, [onWorkspaceChange]);
 
   // Store the callback in a ref to avoid dependency issues
   const handleWorkspaceChangeRef = useRef(handleWorkspaceChange);
@@ -740,33 +746,12 @@ export function BlocklyEditor({
 
   useEffect(() => {
     if (!blocklyDiv.current) {
-      console.log("Blockly div not ready");
       return;
     }
-
-    console.log("Initializing Blockly workspace...");
-    setError(null);
 
     try {
       // Define custom blocks first
       defineCustomBlocks();
-
-      // Verify blocks are registered
-      console.log("Available block types:", Object.keys(Blockly.Blocks));
-      console.log(
-        "Custom blocks registered:",
-        Blockly.Blocks["trading_condition"]
-          ? "trading_condition ✓"
-          : "trading_condition ✗",
-        Blockly.Blocks["trading_action"]
-          ? "trading_action ✓"
-          : "trading_action ✗",
-        Blockly.Blocks["strategy_start"]
-          ? "strategy_start ✓"
-          : "strategy_start ✗"
-      );
-
-      console.log("Creating Blockly workspace...");
 
       // Create workspace with minimal configuration
       const ws = Blockly.inject(blocklyDiv.current, {
@@ -797,13 +782,11 @@ export function BlocklyEditor({
         },
       });
 
-      console.log("Workspace created successfully:", ws);
-      setWorkspace(ws);
+      workspaceRef.current = ws;
 
       // Load initial XML if provided
       if (initialXml) {
         try {
-          console.log("Loading initial XML...");
           const xml = Blockly.utils.xml.textToDom(initialXml);
           Blockly.Xml.domToWorkspace(xml, ws);
         } catch (error) {
@@ -812,44 +795,19 @@ export function BlocklyEditor({
         }
       } else {
         // Add a default strategy start block
-        console.log("Adding default strategy start block...");
         const startBlock = ws.newBlock("strategy_start");
         startBlock.initSvg();
         startBlock.render();
 
-        // Center the initial block - use same logic as reset
-        startBlock.moveBy(50, 50);
+        // Simple centering - just move to a reasonable position
+        startBlock.moveBy(200, 100);
       }
 
       // Add workspace change listener
       ws.addChangeListener(handleWorkspaceChangeRef.current);
 
-      // Add listener for new blocks to center them
-      ws.addChangeListener((event: any) => {
-        if (event.type === Blockly.Events.BLOCK_CREATE && event.blockId) {
-          const block = ws.getBlockById(event.blockId);
-          if (block) {
-            // Get workspace dimensions
-            const workspaceMetrics = ws.getMetrics();
-            const blockMetrics = block.getHeightWidth();
-
-            // Calculate center position - adjust for actual workspace area
-            const centerX =
-              (workspaceMetrics.viewWidth - blockMetrics.width) / 2 - 100; // Offset to account for toolbox
-            const centerY =
-              (workspaceMetrics.viewHeight - blockMetrics.height) / 2 - 50; // Offset to account for header
-
-            // Move block to center
-            block.moveBy(centerX, centerY);
-          }
-        }
-      });
-
       // Mark initialization as complete
-      setTimeout(() => {
-        isInitializing.current = false;
-        console.log("Blockly initialization complete");
-      }, 100);
+      setTimeout(() => {}, 100);
 
       // Cleanup
       return () => {
@@ -876,13 +834,14 @@ export function BlocklyEditor({
   }, [initialXml]);
 
   const handleReset = () => {
-    if (workspace) {
-      workspace.clear();
-      const startBlock = workspace.newBlock("strategy_start");
-      startBlock.initSvg();
-      startBlock.render();
-      startBlock.moveBy(50, 50);
-    }
+    const workspace = workspaceRef.current;
+    if (!workspace) return;
+
+    workspace.clear();
+    const startBlock = workspace.newBlock("strategy_start");
+    startBlock.initSvg();
+    startBlock.render();
+    startBlock.moveBy(200, 100);
   };
 
   const handleTest = () => {
@@ -892,12 +851,29 @@ export function BlocklyEditor({
   };
 
   const handleSave = () => {
-    if (workspace) {
-      const xml = Blockly.Xml.workspaceToDom(workspace);
-      const xmlText = Blockly.Xml.domToText(xml);
-      console.log("Saved workspace:", xmlText);
-      alert("Strategy saved! Check console for XML data.");
-    }
+    const workspace = workspaceRef.current;
+    if (!workspace) return;
+
+    // Disable workspace change listener temporarily
+    isManualOperationRef.current = true;
+
+    const xml = Blockly.Xml.workspaceToDom(workspace);
+    const xmlText = Blockly.Xml.domToText(xml);
+    console.log("Manual save - XML length:", xmlText.length);
+    // Don't call onWorkspaceChange here to avoid re-renders
+    alert("Workspace saved manually!");
+
+    // Re-enable after a short delay
+    setTimeout(() => {
+      isManualOperationRef.current = false;
+    }, 1000);
+  };
+
+  const handleTestWorkspaceChange = () => {
+    const workspace = workspaceRef.current;
+    if (!workspace) return;
+
+    handleWorkspaceChangeRef.current();
   };
 
   return (
@@ -917,6 +893,14 @@ export function BlocklyEditor({
             <Button variant="outline" size="sm" onClick={handleReset}>
               <RotateCcw className="w-4 h-4 mr-2" />
               Reset
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleTestWorkspaceChange}
+            >
+              <Play className="w-4 h-4 mr-2" />
+              Test WS Change
             </Button>
           </div>
         </div>
@@ -1003,6 +987,64 @@ export function BlocklyEditor({
                 .blocklyBlock[data-type="gas_optimization"] {
                   border-radius: 8px !important;
                   box-shadow: 0 2px 4px rgba(116, 185, 255, 0.3) !important;
+                }
+                
+                /* Enhanced toolbox/category menu styling */
+                .blocklyTreeRoot {
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                  border-radius: 12px !important;
+                  margin: 8px !important;
+                  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+                }
+                
+                .blocklyTreeRow {
+                  border-radius: 8px !important;
+                  margin: 4px 8px !important;
+                  transition: all 0.2s ease !important;
+                }
+                
+                .blocklyTreeRow:hover {
+                  background: rgba(255, 255, 255, 0.1) !important;
+                  transform: translateX(4px) !important;
+                }
+                
+                .blocklyTreeSelected {
+                  background: rgba(255, 255, 255, 0.2) !important;
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+                }
+                
+                .blocklyTreeIcon {
+                  border-radius: 6px !important;
+                  margin: 4px !important;
+                }
+                
+                .blocklyTreeIconClosed {
+                  background: rgba(255, 255, 255, 0.9) !important;
+                }
+                
+                .blocklyTreeIconOpen {
+                  background: rgba(255, 255, 255, 0.9) !important;
+                }
+                
+                /* Category headers styling */
+                .blocklyTreeLabel {
+                  font-weight: 600 !important;
+                  color: #ffffff !important;
+                  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+                  padding: 8px 12px !important;
+                }
+                
+                /* Block items in toolbox */
+                .blocklyTreeContent {
+                  border-radius: 6px !important;
+                  margin: 2px 4px !important;
+                  transition: all 0.2s ease !important;
+                }
+                
+                .blocklyTreeContent:hover {
+                  background: rgba(255, 255, 255, 0.15) !important;
+                  transform: scale(1.02) !important;
                 }
                 
                 /* Hover effects - disabled to prevent oscillation */

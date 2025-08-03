@@ -1,63 +1,122 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import { useRouter, useParams } from 'next/navigation';
-import { Navbar } from '@/components/navbar';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { OrbIcon } from '@/components/ui/orb-icon';
-import { useOrbStore } from '@/lib/store';
-import { ArrowLeft, Rocket, Clock } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { toast } from 'sonner';
+import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
+import { useRouter, useParams } from "next/navigation";
+import { Navbar } from "@/components/navbar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { OrbIcon } from "@/components/ui/orb-icon";
+import { useOrbStore } from "@/lib/store";
+import { ArrowLeft, Rocket, Clock, Save } from "lucide-react";
+import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 // Dynamic import for client-side only rendering
-const BlocklyEditor = dynamic(() => import('@/components/blockly-editor').then(mod => ({ default: mod.BlocklyEditor })), {
-  ssr: false,
-  loading: () => <div className="h-[600px] flex items-center justify-center border-2 border-gray-200 rounded-lg">Loading visual editor...</div>
-});
+const BlocklyEditor = dynamic(
+  () =>
+    import("@/components/blockly-editor").then((mod) => ({
+      default: mod.BlocklyEditor,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[600px] flex items-center justify-center border-2 border-gray-200 rounded-lg">
+        Loading visual editor...
+      </div>
+    ),
+  }
+);
 
 export default function EditOrbPage() {
   const router = useRouter();
   const params = useParams();
   const orbId = params.orbId as string;
-  
+
   const { orbs, updateOrb } = useOrbStore();
-  const setShowSuccessToast = useOrbStore(state => state.setShowSuccessToast);
-  const [orbName, setOrbName] = useState('');
-  const [currentBlocks, setCurrentBlocks] = useState<string>('');
-  const [selectedEpoch, setSelectedEpoch] = useState<string>('15');
-  
-  const orb = orbs.find(o => o.id === orbId);
+  const setShowSuccessToast = useOrbStore((state) => state.setShowSuccessToast);
+  const [orbName, setOrbName] = useState("");
+  const [currentBlocks, setCurrentBlocks] = useState<string>("");
+  const [blocksLoaded, setBlocksLoaded] = useState(false);
+  const [selectedEpoch, setSelectedEpoch] = useState<string>("15");
+  const [autoSaveStatus, setAutoSaveStatus] = useState<
+    "saved" | "saving" | "error"
+  >("saved");
+
+  const orb = orbs.find((o) => o.id === orbId);
+
+  // Auto-save functionality
+  useEffect(() => {
+    if (!orb || !currentBlocks) return;
+
+    setAutoSaveStatus("saving");
+    const timeoutId = setTimeout(() => {
+      try {
+        updateOrb(orb.id, {
+          name: orbName,
+          blocks: currentBlocks,
+        });
+        setAutoSaveStatus("saved");
+      } catch (error) {
+        setAutoSaveStatus("error");
+        console.error("Auto-save failed:", error);
+      }
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [currentBlocks, orbName, orb, updateOrb]);
 
   useEffect(() => {
     if (orb) {
       setOrbName(orb.name);
-      setCurrentBlocks(orb.blocks || '');
+      setCurrentBlocks(orb.blocks || "");
+      setBlocksLoaded(true);
     } else {
-      router.push('/');
+      toast.error("Orb not found");
+      router.push("/");
     }
   }, [orb, router]);
 
   const handleSaveChanges = () => {
     if (orb) {
-      updateOrb(orb.id, { 
+      updateOrb(orb.id, {
         name: orbName,
-        blocks: currentBlocks 
+        blocks: currentBlocks,
       });
-      toast.success('Orb updated successfully!');
+      toast.success("Orb updated successfully!");
       setTimeout(() => {
-        window.location.href = `/orb/${orb.id}`;
+        router.push(`/orb/${orb.id}`);
       }, 1500);
     }
   };
 
+  const handleBackToOrb = () => {
+    router.push(`/orb/${orbId}`);
+  };
 
   if (!orb) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading orb...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -68,8 +127,19 @@ export default function EditOrbPage() {
         {/* Builder Header */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              onClick={handleBackToOrb}
+              className="mr-4"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Orb
+            </Button>
             <div className="flex items-center gap-3">
-              <OrbIcon size="md" gradient={parseInt(orb.id) % 5 + 1} />
+              <OrbIcon
+                size="md"
+                gradient={((parseInt(orb.id) % 5) + 1) as 1 | 2 | 3 | 4 | 5}
+              />
               <div>
                 <Input
                   value={orbName}
@@ -77,14 +147,33 @@ export default function EditOrbPage() {
                   className="text-xl font-bold border-0 p-0 h-auto bg-transparent focus:ring-0 focus:border-b focus:border-indigo-500"
                   placeholder="Orb Name"
                 />
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span>Auto-saving</span>
+                  <div
+                    className={`w-2 h-2 rounded-full ${
+                      autoSaveStatus === "saved"
+                        ? "bg-green-500"
+                        : autoSaveStatus === "saving"
+                        ? "bg-yellow-500"
+                        : "bg-red-500"
+                    }`}
+                  />
+                  <span className="capitalize">{autoSaveStatus}</span>
+                  <span>
+                    • Last modified:{" "}
+                    {new Date(orb.lastModified).toLocaleString()}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg border border-gray-200">
               <Clock className="w-4 h-4 text-gray-500" />
-              <span className="text-sm font-semibold text-gray-700">EPOCH:</span>
+              <span className="text-sm font-semibold text-gray-700">
+                EPOCH:
+              </span>
               <Select value={selectedEpoch} onValueChange={setSelectedEpoch}>
                 <SelectTrigger className="w-24 h-8 border-0 bg-transparent focus:ring-0 text-sm font-medium">
                   <SelectValue placeholder="Epoch" />
@@ -96,9 +185,16 @@ export default function EditOrbPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={handleSaveChanges} className="bg-indigo-600 hover:bg-indigo-700">
-              <Rocket className="w-4 h-4 mr-2" />
+            <Button variant="outline" onClick={handleSaveChanges}>
+              <Save className="w-4 h-4 mr-2" />
               Save Changes
+            </Button>
+            <Button
+              onClick={handleSaveChanges}
+              className="bg-indigo-600 hover:bg-indigo-700"
+            >
+              <Rocket className="w-4 h-4 mr-2" />
+              Update Orb
             </Button>
           </div>
         </div>
@@ -107,7 +203,9 @@ export default function EditOrbPage() {
         <Card className="mb-8">
           <CardHeader>
             <CardTitle className="text-lg">Original Strategy Prompt</CardTitle>
-            <CardDescription>Edit your visual strategy based on this description</CardDescription>
+            <CardDescription>
+              Edit your visual strategy based on this description
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="bg-gray-50 p-4 rounded-lg">
@@ -122,12 +220,13 @@ export default function EditOrbPage() {
           transition={{ duration: 0.5 }}
         >
           <BlocklyEditor
+            key={`orb-${orbId}-${blocksLoaded ? "loaded" : "empty"}`}
             initialXml={currentBlocks}
             onWorkspaceChange={(xmlString) => {
               setCurrentBlocks(xmlString);
             }}
             onCodeGenerate={(code) => {
-              console.log('Generated code:', code);
+              console.log("Generated code:", code);
             }}
           />
         </motion.div>
