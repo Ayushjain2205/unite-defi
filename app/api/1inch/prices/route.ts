@@ -7,8 +7,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const chainId = searchParams.get("chainId") || "1";
-    const tokenAddress = searchParams.get("tokenAddress");
-    const tokenSymbol = searchParams.get("tokenSymbol");
+    const tokenAddress = searchParams.get("tokenAddress") || undefined;
+    const tokenSymbol = searchParams.get("tokenSymbol") || undefined;
     const currency = searchParams.get("currency") || "USD";
 
     if (!tokenAddress && !tokenSymbol) {

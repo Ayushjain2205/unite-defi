@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const walletAddress = searchParams.get("walletAddress");
     const chainId = searchParams.get("chainId") || "1";
-    const status = searchParams.get("status"); // 'active', 'filled', 'cancelled'
+    const status = searchParams.get("status") || undefined; // 'active', 'filled', 'cancelled'
 
     if (!walletAddress) {
       return NextResponse.json(

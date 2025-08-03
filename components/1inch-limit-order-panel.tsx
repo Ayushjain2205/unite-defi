@@ -103,7 +103,9 @@ export function OneInchLimitOrderPanel() {
         limitPrice: "",
       }));
     } catch (error) {
-      toast.error(`Failed to create order: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      toast.error(`Failed to create order: ${errorMessage}`);
     }
   };
 
@@ -123,7 +125,9 @@ export function OneInchLimitOrderPanel() {
       });
       setQuote(quoteData);
     } catch (error) {
-      toast.error(`Failed to get quote: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      toast.error(`Failed to get quote: ${errorMessage}`);
     }
   };
 
@@ -133,7 +137,9 @@ export function OneInchLimitOrderPanel() {
       toast.success("Order cancelled successfully!");
       await loadOrders();
     } catch (error) {
-      toast.error(`Failed to cancel order: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      toast.error(`Failed to cancel order: ${errorMessage}`);
     }
   };
 

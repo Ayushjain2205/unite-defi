@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const walletAddress = searchParams.get("walletAddress");
     const chainId = searchParams.get("chainId") || "1";
-    const tokenAddress = searchParams.get("tokenAddress");
+    const tokenAddress = searchParams.get("tokenAddress") || undefined;
 
     if (!walletAddress) {
       return NextResponse.json(

@@ -140,7 +140,9 @@ export class OneInchService {
       };
     } catch (error) {
       console.error("Error creating limit order:", error);
-      throw new Error(`Failed to create limit order: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to create limit order: ${errorMessage}`);
     }
   }
 
@@ -177,7 +179,9 @@ export class OneInchService {
       );
     } catch (error) {
       console.error("Error fetching limit orders:", error);
-      throw new Error(`Failed to fetch limit orders: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to fetch limit orders: ${errorMessage}`);
     }
   }
 
@@ -212,7 +216,9 @@ export class OneInchService {
       return updatedOrder;
     } catch (error) {
       console.error("Error modifying limit order:", error);
-      throw new Error(`Failed to modify limit order: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to modify limit order: ${errorMessage}`);
     }
   }
 
@@ -232,7 +238,9 @@ export class OneInchService {
       );
     } catch (error) {
       console.error("Error cancelling limit order:", error);
-      throw new Error(`Failed to cancel limit order: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to cancel limit order: ${errorMessage}`);
     }
   }
 
@@ -354,11 +362,11 @@ export class OneInchService {
   }
 
   private generateSalt(): string {
-    return ethers.utils.randomBytes(32).toString("hex");
+    return ethers.utils.randomBytes(32).toString();
   }
 
   private generateOrderId(): string {
-    return ethers.utils.id(Date.now().toString() + Math.random().toString());
+    return Date.now().toString() + Math.random().toString();
   }
 
   private mapOrderStatus(status: string): LimitOrderResponse["status"] {
@@ -435,7 +443,9 @@ export class OneInchService {
       return null;
     } catch (error) {
       console.error("Error getting token info:", error);
-      throw new Error(`Failed to get token info: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to get token info: ${errorMessage}`);
     }
   }
 
@@ -469,7 +479,9 @@ export class OneInchService {
       };
     } catch (error) {
       console.error("Error getting quote:", error);
-      throw new Error(`Failed to get quote: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to get quote: ${errorMessage}`);
     }
   }
 
@@ -524,7 +536,9 @@ export class OneInchService {
       };
     } catch (error) {
       console.error("Error executing swap:", error);
-      throw new Error(`Failed to execute swap: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to execute swap: ${errorMessage}`);
     }
   }
 
@@ -552,7 +566,9 @@ export class OneInchService {
       }
     } catch (error) {
       console.error("Error getting wallet balances:", error);
-      throw new Error(`Failed to get wallet balances: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to get wallet balances: ${errorMessage}`);
     }
   }
 
@@ -573,7 +589,9 @@ export class OneInchService {
       return response;
     } catch (error) {
       console.error("Error getting token balances:", error);
-      throw new Error(`Failed to get token balances: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to get token balances: ${errorMessage}`);
     }
   }
 
@@ -602,7 +620,9 @@ export class OneInchService {
       return null;
     } catch (error) {
       console.error("Error getting token metadata:", error);
-      throw new Error(`Failed to get token metadata: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to get token metadata: ${errorMessage}`);
     }
   }
 
@@ -629,9 +649,9 @@ export class OneInchService {
       return results.filter(Boolean);
     } catch (error) {
       console.error("Error getting multiple token metadata:", error);
-      throw new Error(
-        `Failed to get multiple token metadata: ${error.message}`
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to get multiple token metadata: ${errorMessage}`);
     }
   }
 
@@ -661,7 +681,9 @@ export class OneInchService {
       return null;
     } catch (error) {
       console.error("Error getting token price:", error);
-      throw new Error(`Failed to get token price: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to get token price: ${errorMessage}`);
     }
   }
 
@@ -690,7 +712,9 @@ export class OneInchService {
       return results.filter(Boolean);
     } catch (error) {
       console.error("Error getting multiple token prices:", error);
-      throw new Error(`Failed to get multiple token prices: ${error.message}`);
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      throw new Error(`Failed to get multiple token prices: ${errorMessage}`);
     }
   }
 }

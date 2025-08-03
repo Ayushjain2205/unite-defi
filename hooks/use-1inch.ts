@@ -148,9 +148,9 @@ export function use1Inch() {
   const modifyLimitOrder = useCallback(
     async (
       orderId: string,
+      walletAddress: string,
       newPrice?: number,
-      newAmount?: number,
-      walletAddress: string
+      newAmount?: number
     ): Promise<LimitOrderResponse> => {
       setLoading(true);
       setError(null);
