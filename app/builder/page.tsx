@@ -47,12 +47,13 @@ export default function VisualBuilderPage() {
   const searchParams = useSearchParams();
   const prompt = searchParams.get("prompt") || "";
   const loadDraftId = searchParams.get("load") || "";
+  const initialBlocks = searchParams.get("blocks") || "";
 
   const { createDraft, updateDraft, publishOrb } = useOrbStore();
   const [orbName, setOrbName] = useState(
     `Trading Bot ${Date.now().toString().slice(-4)}`
   );
-  const [currentBlocks, setCurrentBlocks] = useState<string>("");
+  const [currentBlocks, setCurrentBlocks] = useState<string>(initialBlocks);
   const [selectedEpoch, setSelectedEpoch] = useState<string>("15");
   const [currentDraftId, setCurrentDraftId] = useState<string>("");
   const [autoSaveStatus, setAutoSaveStatus] = useState<

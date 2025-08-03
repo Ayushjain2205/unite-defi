@@ -44,6 +44,12 @@ export default function Home() {
 
   const handleSelectTemplate = (template: any) => {
     setPrompt(template.prompt);
+    // Navigate to builder with both prompt and blockly XML
+    const params = new URLSearchParams({
+      prompt: template.prompt,
+      blocks: template.blocklyXml,
+    });
+    router.push(`/builder?${params.toString()}`);
   };
 
   const handleEditOrb = (orbId: string) => {
