@@ -47,18 +47,30 @@ export default function VisualBuilderPage() {
   const searchParams = useSearchParams();
   const prompt = searchParams.get("prompt") || "";
   const loadDraftId = searchParams.get("load") || "";
-  const initialBlocks = searchParams.get("blocks") || "";
+  const templateId = searchParams.get("template") || "";
 
   const { createDraft, updateDraft, publishOrb } = useOrbStore();
   const [orbName, setOrbName] = useState(
     `Trading Bot ${Date.now().toString().slice(-4)}`
   );
-  const [currentBlocks, setCurrentBlocks] = useState<string>(initialBlocks);
+  const [currentBlocks, setCurrentBlocks] = useState<string>("");
   const [selectedEpoch, setSelectedEpoch] = useState<string>("15");
   const [currentDraftId, setCurrentDraftId] = useState<string>("");
   const [autoSaveStatus, setAutoSaveStatus] = useState<
     "saved" | "saving" | "error"
   >("saved");
+
+  // Load template blocks if template ID is provided
+  useEffect(() => {
+    if (templateId) {
+      import("@/lib/templates").then(({ getTemplate }) => {
+        const template = getTemplate(templateId);
+        if (template) {
+          setCurrentBlocks(template.blocklyXml);
+        }
+      });
+    }
+  }, [templateId]);
 
   // Auto-save functionality
   useEffect(() => {

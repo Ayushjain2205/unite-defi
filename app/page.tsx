@@ -44,10 +44,10 @@ export default function Home() {
 
   const handleSelectTemplate = (template: any) => {
     setPrompt(template.prompt);
-    // Navigate to builder with both prompt and blockly XML
+    // Navigate to builder with template ID only
     const params = new URLSearchParams({
       prompt: template.prompt,
-      blocks: template.blocklyXml,
+      template: template.id,
     });
     router.push(`/builder?${params.toString()}`);
   };
