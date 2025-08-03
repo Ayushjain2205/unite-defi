@@ -30,6 +30,334 @@ const defineCustomBlocks = () => {
 
   // Advanced trading blocks
   Blockly.defineBlocksWithJsonArray([
+    // 1inch Limit Order Blocks
+    {
+      type: "limit_order_1inch",
+      message0: "1inch Limit Order %1 %2 %3 %4 %5 %6",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "ORDER_SIDE",
+          options: [
+            ["Buy", "BUY"],
+            ["Sell", "SELL"],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "AMOUNT",
+          check: "Number",
+        },
+        {
+          type: "field_dropdown",
+          name: "FROM_TOKEN",
+          options: [
+            ["USDT", "USDT"],
+            ["USDC", "USDC"],
+            ["ETH", "ETH"],
+            ["BTC", "BTC"],
+            ["SOL", "SOL"],
+            ["ADA", "ADA"],
+            ["DOT", "DOT"],
+            ["LINK", "LINK"],
+            ["MATIC", "MATIC"],
+            ["AVAX", "AVAX"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "TO_TOKEN",
+          options: [
+            ["USDT", "USDT"],
+            ["USDC", "USDC"],
+            ["ETH", "ETH"],
+            ["BTC", "BTC"],
+            ["SOL", "SOL"],
+            ["ADA", "ADA"],
+            ["DOT", "DOT"],
+            ["LINK", "LINK"],
+            ["MATIC", "MATIC"],
+            ["AVAX", "AVAX"],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "LIMIT_PRICE",
+          check: "Number",
+        },
+        {
+          type: "field_dropdown",
+          name: "EXPIRY",
+          options: [
+            ["1 hour", "1H"],
+            ["4 hours", "4H"],
+            ["1 day", "1D"],
+            ["7 days", "7D"],
+            ["30 days", "30D"],
+            ["No expiry", "NEVER"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#FF6B35",
+      tooltip: "Create a 1inch limit order",
+    },
+    {
+      type: "limit_order_condition",
+      message0: "When %1 %2 %3 %4 %5",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "CONDITION_TYPE",
+          options: [
+            ["Price crosses above", "PRICE_CROSS_ABOVE"],
+            ["Price crosses below", "PRICE_CROSS_BELOW"],
+            ["Price is above", "PRICE_ABOVE"],
+            ["Price is below", "PRICE_BELOW"],
+            ["Volume spike", "VOLUME_SPIKE"],
+            ["RSI condition", "RSI_CONDITION"],
+            ["MACD signal", "MACD_SIGNAL"],
+            ["Time-based", "TIME_BASED"],
+          ],
+        },
+        {
+          type: "input_value",
+          name: "THRESHOLD",
+          check: "Number",
+        },
+        {
+          type: "field_dropdown",
+          name: "TOKEN_PAIR",
+          options: [
+            ["ETH/USDT", "ETH_USDT"],
+            ["BTC/USDT", "BTC_USDT"],
+            ["SOL/USDT", "SOL_USDT"],
+            ["ADA/USDT", "ADA_USDT"],
+            ["DOT/USDT", "DOT_USDT"],
+            ["LINK/USDT", "LINK_USDT"],
+            ["MATIC/USDT", "MATIC_USDT"],
+            ["AVAX/USDT", "AVAX_USDT"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "TIMEFRAME",
+          options: [
+            ["1m", "1m"],
+            ["5m", "5m"],
+            ["15m", "15m"],
+            ["1h", "1h"],
+            ["4h", "4h"],
+            ["1d", "1d"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "EXECUTION_TYPE",
+          options: [
+            ["Execute immediately", "IMMEDIATE"],
+            ["Place limit order", "LIMIT_ORDER"],
+            ["Place stop order", "STOP_ORDER"],
+            ["Place OCO order", "OCO_ORDER"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      output: "Boolean",
+      colour: "#FF8C42",
+      tooltip: "Condition for executing limit orders",
+    },
+    {
+      type: "limit_order_management",
+      message0: "Limit Order Management %1 %2 %3",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "ACTION",
+          options: [
+            ["Place Order", "PLACE"],
+            ["Cancel Order", "CANCEL"],
+            ["Modify Order", "MODIFY"],
+            ["Get Order Status", "STATUS"],
+            ["List Active Orders", "LIST"],
+            ["Cancel All Orders", "CANCEL_ALL"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "ORDER_TYPE",
+          options: [
+            ["Limit Order", "LIMIT"],
+            ["Stop Limit", "STOP_LIMIT"],
+            ["OCO Order", "OCO"],
+            ["Trailing Stop", "TRAILING_STOP"],
+            ["Time-weighted", "TWAP"],
+            ["Iceberg Order", "ICEBERG"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "PROTOCOL",
+          options: [
+            ["1inch", "1INCH"],
+            ["1inch Fusion", "1INCH_FUSION"],
+            ["1inch Limit Orders", "1INCH_LIMIT"],
+            ["1inch Aggregator", "1INCH_AGGREGATOR"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#FFA500",
+      tooltip: "Manage 1inch limit orders",
+    },
+    {
+      type: "limit_order_strategy",
+      message0: "Limit Order Strategy %1 %2 %3",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "STRATEGY_TYPE",
+          options: [
+            ["Grid Trading", "GRID"],
+            ["DCA Strategy", "DCA"],
+            ["Arbitrage", "ARBITRAGE"],
+            ["Mean Reversion", "MEAN_REVERSION"],
+            ["Momentum Trading", "MOMENTUM"],
+            ["Scalping", "SCALPING"],
+            ["Swing Trading", "SWING"],
+            ["Custom Strategy", "CUSTOM"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "RISK_LEVEL",
+          options: [
+            ["Conservative", "CONSERVATIVE"],
+            ["Moderate", "MODERATE"],
+            ["Aggressive", "AGGRESSIVE"],
+            ["Very Aggressive", "VERY_AGGRESSIVE"],
+          ],
+        },
+        {
+          type: "input_statement",
+          name: "CONFIG",
+        },
+      ],
+      inputsInline: false,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#FF6347",
+      tooltip: "Configure limit order strategy",
+    },
+    {
+      type: "limit_order_config",
+      message0: "Strategy Config %1 %2 %3 %4",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "GRID_SPACING",
+          options: [
+            ["0.1%", "0.001"],
+            ["0.5%", "0.005"],
+            ["1%", "0.01"],
+            ["2%", "0.02"],
+            ["5%", "0.05"],
+            ["10%", "0.1"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "POSITION_SIZE",
+          options: [
+            ["1% of portfolio", "0.01"],
+            ["2% of portfolio", "0.02"],
+            ["5% of portfolio", "0.05"],
+            ["10% of portfolio", "0.1"],
+            ["20% of portfolio", "0.2"],
+            ["Fixed amount", "FIXED"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "MAX_ORDERS",
+          options: [
+            ["5 orders", "5"],
+            ["10 orders", "10"],
+            ["20 orders", "20"],
+            ["50 orders", "50"],
+            ["100 orders", "100"],
+            ["Unlimited", "UNLIMITED"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "SLIPPAGE_TOLERANCE",
+          options: [
+            ["0.1%", "0.001"],
+            ["0.5%", "0.005"],
+            ["1%", "0.01"],
+            ["2%", "0.02"],
+            ["5%", "0.05"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#FF7F50",
+      tooltip: "Configure limit order parameters",
+    },
+    {
+      type: "limit_order_monitoring",
+      message0: "Monitor Orders %1 %2 %3",
+      args0: [
+        {
+          type: "field_dropdown",
+          name: "MONITOR_TYPE",
+          options: [
+            ["Order Status", "STATUS"],
+            ["Fill Rate", "FILL_RATE"],
+            ["Execution Time", "EXECUTION_TIME"],
+            ["Slippage", "SLIPPAGE"],
+            ["Gas Costs", "GAS_COSTS"],
+            ["Profit/Loss", "P_L"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "ALERT_TYPE",
+          options: [
+            ["Order Filled", "ORDER_FILLED"],
+            ["Order Cancelled", "ORDER_CANCELLED"],
+            ["Price Alert", "PRICE_ALERT"],
+            ["Volume Alert", "VOLUME_ALERT"],
+            ["Error Alert", "ERROR_ALERT"],
+            ["Performance Alert", "PERFORMANCE_ALERT"],
+          ],
+        },
+        {
+          type: "field_dropdown",
+          name: "NOTIFICATION",
+          options: [
+            ["Email", "EMAIL"],
+            ["SMS", "SMS"],
+            ["Push Notification", "PUSH"],
+            ["Telegram", "TELEGRAM"],
+            ["Discord", "DISCORD"],
+            ["Slack", "SLACK"],
+          ],
+        },
+      ],
+      inputsInline: true,
+      previousStatement: null,
+      nextStatement: null,
+      colour: "#FF4500",
+      tooltip: "Monitor and alert on limit orders",
+    },
     // AI Agent Blocks
     {
       type: "ai_agent",
@@ -47,6 +375,7 @@ const defineCustomBlocks = () => {
             ["News Analysis Agent", "NEWS_ANALYSIS"],
             ["Technical Analysis Agent", "TECHNICAL_ANALYSIS"],
             ["Arbitrage Agent", "ARBITRAGE_AGENT"],
+            ["Limit Order Agent", "LIMIT_ORDER_AGENT"],
           ],
         },
         {
@@ -927,6 +1256,37 @@ const toolbox = {
     },
     {
       kind: "category",
+      name: "🎯 Limit Orders",
+      colour: "#FF6B35",
+      contents: [
+        {
+          kind: "block",
+          type: "limit_order_1inch",
+        },
+        {
+          kind: "block",
+          type: "limit_order_condition",
+        },
+        {
+          kind: "block",
+          type: "limit_order_management",
+        },
+        {
+          kind: "block",
+          type: "limit_order_strategy",
+        },
+        {
+          kind: "block",
+          type: "limit_order_config",
+        },
+        {
+          kind: "block",
+          type: "limit_order_monitoring",
+        },
+      ],
+    },
+    {
+      kind: "category",
       name: "🛡️ Risk Management",
       colour: "#FF9F43",
       contents: [
@@ -1302,6 +1662,43 @@ export function BlocklyEditor({
                 .blocklyBlock[data-type="gas_optimization"] {
                   border-radius: 8px !important;
                   box-shadow: 0 2px 4px rgba(116, 185, 255, 0.3) !important;
+                }
+                
+                /* 1inch Limit Order Block Styles */
+                .blocklyBlock[data-type="limit_order_1inch"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3) !important;
+                  background: linear-gradient(135deg, #FF6B35 0%, #FF8C42 100%) !important;
+                }
+                
+                .blocklyBlock[data-type="limit_order_condition"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(255, 140, 66, 0.3) !important;
+                  background: linear-gradient(135deg, #FF8C42 0%, #FFA500 100%) !important;
+                }
+                
+                .blocklyBlock[data-type="limit_order_management"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(255, 165, 0, 0.3) !important;
+                  background: linear-gradient(135deg, #FFA500 0%, #FFB84D 100%) !important;
+                }
+                
+                .blocklyBlock[data-type="limit_order_strategy"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(255, 99, 71, 0.3) !important;
+                  background: linear-gradient(135deg, #FF6347 0%, #FF7F50 100%) !important;
+                }
+                
+                .blocklyBlock[data-type="limit_order_config"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(255, 127, 80, 0.3) !important;
+                  background: linear-gradient(135deg, #FF7F50 0%, #FF9F7F 100%) !important;
+                }
+                
+                .blocklyBlock[data-type="limit_order_monitoring"] {
+                  border-radius: 8px !important;
+                  box-shadow: 0 2px 4px rgba(255, 69, 0, 0.3) !important;
+                  background: linear-gradient(135deg, #FF4500 0%, #FF6347 100%) !important;
                 }
                 
                 /* AI Block Styles */

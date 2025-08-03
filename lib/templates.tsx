@@ -910,6 +910,378 @@ export const TEMPLATE_REGISTRY: Record<string, Template> = {
   </block>
 </xml>`,
   },
+  "1inch-grid-trading": {
+    id: "1inch-grid-trading",
+    name: "1inch Grid Trading",
+    description: "Automated grid trading using 1inch limit orders",
+    prompt:
+      "Set up a grid trading strategy with 1inch limit orders at 2% intervals",
+    icon: <BarChart3 className="w-5 h-5" />,
+    category: "1inch",
+    blocklyXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="strategy_start" x="200" y="100">
+    <statement name="DO">
+      <block type="limit_order_strategy" x="200" y="200">
+        <field name="STRATEGY_TYPE">GRID</field>
+        <field name="RISK_LEVEL">MODERATE</field>
+        <statement name="CONFIG">
+          <block type="limit_order_config" x="200" y="300">
+            <field name="GRID_SPACING">0.02</field>
+            <field name="POSITION_SIZE">0.05</field>
+            <field name="MAX_ORDERS">20</field>
+            <field name="SLIPPAGE_TOLERANCE">0.01</field>
+          </block>
+          <block type="controls_repeat_ext" x="200" y="400">
+            <value name="TIMES">
+              <block type="math_number" x="200" y="450">
+                <field name="NUM">10</field>
+              </block>
+            </value>
+            <statement name="DO">
+              <block type="limit_order_1inch" x="200" y="500">
+                <field name="ORDER_SIDE">BUY</field>
+                <value name="AMOUNT">
+                  <block type="math_number" x="200" y="550">
+                    <field name="NUM">50</field>
+                  </block>
+                </value>
+                <field name="FROM_TOKEN">USDT</field>
+                <field name="TO_TOKEN">ETH</field>
+                <value name="LIMIT_PRICE">
+                  <block type="math_arithmetic" x="200" y="600">
+                    <field name="OP">MULTIPLY</field>
+                    <value name="A">
+                      <block type="get_price" x="200" y="650">
+                        <field name="ASSET">ETH</field>
+                        <field name="EXCHANGE">BINANCE</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="math_number" x="200" y="700">
+                        <field name="NUM">0.98</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <field name="EXPIRY">1D</field>
+              </block>
+            </statement>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>`,
+  },
+  "1inch-dca-strategy": {
+    id: "1inch-dca-strategy",
+    name: "1inch DCA Strategy",
+    description: "Dollar-cost averaging with 1inch limit orders",
+    prompt: "Automatically place limit orders for DCA when price drops 5%",
+    icon: <Clock className="w-5 h-5" />,
+    category: "1inch",
+    blocklyXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="strategy_start" x="200" y="100">
+    <statement name="DO">
+      <block type="controls_if" x="200" y="200">
+        <value name="IF0">
+          <block type="limit_order_condition" x="200" y="250">
+            <field name="CONDITION_TYPE">PRICE_CROSS_BELOW</field>
+            <value name="THRESHOLD">
+              <block type="math_arithmetic" x="200" y="300">
+                <field name="OP">MULTIPLY</field>
+                <value name="A">
+                  <block type="get_price" x="200" y="350">
+                    <field name="ASSET">BTC</field>
+                    <field name="EXCHANGE">BINANCE</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="math_number" x="200" y="400">
+                    <field name="NUM">0.95</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <field name="TOKEN_PAIR">BTC_USDT</field>
+            <field name="TIMEFRAME">1h</field>
+            <field name="EXECUTION_TYPE">LIMIT_ORDER</field>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="limit_order_1inch" x="200" y="450">
+            <field name="ORDER_SIDE">BUY</field>
+            <value name="AMOUNT">
+              <block type="math_number" x="200" y="500">
+                <field name="NUM">100</field>
+              </block>
+            </value>
+            <field name="FROM_TOKEN">USDT</field>
+            <field name="TO_TOKEN">BTC</field>
+            <value name="LIMIT_PRICE">
+              <block type="get_price" x="200" y="550">
+                <field name="ASSET">BTC</field>
+                <field name="EXCHANGE">BINANCE</field>
+              </block>
+            </value>
+            <field name="EXPIRY">7D</field>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>`,
+  },
+  "1inch-arbitrage": {
+    id: "1inch-arbitrage",
+    name: "1inch Arbitrage",
+    description: "Cross-DEX arbitrage using 1inch limit orders",
+    prompt: "Execute arbitrage trades when price difference > 1% using 1inch",
+    icon: <Target className="w-5 h-5" />,
+    category: "1inch",
+    blocklyXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="strategy_start" x="200" y="100">
+    <statement name="DO">
+      <block type="controls_if" x="200" y="200">
+        <value name="IF0">
+          <block type="logic_compare" x="200" y="250">
+            <field name="OP">GT</field>
+            <value name="A">
+              <block type="math_arithmetic" x="200" y="300">
+                <field name="OP">MINUS</field>
+                <value name="A">
+                  <block type="get_price" x="200" y="350">
+                    <field name="ASSET">ETH</field>
+                    <field name="EXCHANGE">UNISWAP</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="get_price" x="200" y="400">
+                    <field name="ASSET">ETH</field>
+                    <field name="EXCHANGE">SUSHISWAP</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <value name="B">
+              <block type="math_arithmetic" x="200" y="450">
+                <field name="OP">MULTIPLY</field>
+                <value name="A">
+                  <block type="get_price" x="200" y="500">
+                    <field name="ASSET">ETH</field>
+                    <field name="EXCHANGE">UNISWAP</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="math_number" x="200" y="550">
+                    <field name="NUM">0.01</field>
+                  </block>
+                </value>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="limit_order_1inch" x="200" y="600">
+            <field name="ORDER_SIDE">BUY</field>
+            <value name="AMOUNT">
+              <block type="math_number" x="200" y="650">
+                <field name="NUM">200</field>
+              </block>
+            </value>
+            <field name="FROM_TOKEN">USDT</field>
+            <field name="TO_TOKEN">ETH</field>
+            <value name="LIMIT_PRICE">
+              <block type="get_price" x="200" y="700">
+                <field name="ASSET">ETH</field>
+                <field name="EXCHANGE">SUSHISWAP</field>
+              </block>
+            </value>
+            <field name="EXPIRY">1H</field>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>`,
+  },
+  "1inch-mean-reversion": {
+    id: "1inch-mean-reversion",
+    name: "1inch Mean Reversion",
+    description: "Mean reversion strategy using 1inch limit orders",
+    prompt: "Buy when price drops below 20-day MA, sell when above MA + 5%",
+    icon: <TrendingUp className="w-5 h-5" />,
+    category: "1inch",
+    blocklyXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="strategy_start" x="200" y="100">
+    <statement name="DO">
+      <block type="controls_if" x="200" y="200">
+        <value name="IF0">
+          <block type="logic_compare" x="200" y="250">
+            <field name="OP">LT</field>
+            <value name="A">
+              <block type="get_price" x="200" y="300">
+                <field name="ASSET">ETH</field>
+                <field name="EXCHANGE">BINANCE</field>
+              </block>
+            </value>
+            <value name="B">
+              <block type="technical_indicator" x="200" y="350">
+                <field name="INDICATOR">MA</field>
+                <field name="OPERATOR">EQ</field>
+                <value name="VALUE">
+                  <block type="math_number" x="200" y="400">
+                    <field name="NUM">20</field>
+                  </block>
+                </value>
+                <field name="TIMEFRAME">1d</field>
+              </block>
+            </value>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="limit_order_1inch" x="200" y="450">
+            <field name="ORDER_SIDE">BUY</field>
+            <value name="AMOUNT">
+              <block type="math_number" x="200" y="500">
+                <field name="NUM">150</field>
+              </block>
+            </value>
+            <field name="FROM_TOKEN">USDT</field>
+            <field name="TO_TOKEN">ETH</field>
+            <value name="LIMIT_PRICE">
+              <block type="get_price" x="200" y="550">
+                <field name="ASSET">ETH</field>
+                <field name="EXCHANGE">BINANCE</field>
+              </block>
+            </value>
+            <field name="EXPIRY">4H</field>
+          </block>
+        </statement>
+        <next>
+          <block type="controls_if" x="200" y="600">
+            <value name="IF0">
+              <block type="logic_compare" x="200" y="650">
+                <field name="OP">GT</field>
+                <value name="A">
+                  <block type="get_price" x="200" y="700">
+                    <field name="ASSET">ETH</field>
+                    <field name="EXCHANGE">BINANCE</field>
+                  </block>
+                </value>
+                <value name="B">
+                  <block type="math_arithmetic" x="200" y="750">
+                    <field name="OP">MULTIPLY</field>
+                    <value name="A">
+                      <block type="technical_indicator" x="200" y="800">
+                        <field name="INDICATOR">MA</field>
+                        <field name="OPERATOR">EQ</field>
+                        <value name="VALUE">
+                          <block type="math_number" x="200" y="850">
+                            <field name="NUM">20</field>
+                          </block>
+                        </value>
+                        <field name="TIMEFRAME">1d</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="math_number" x="200" y="900">
+                        <field name="NUM">1.05</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+              </block>
+            </value>
+            <statement name="DO0">
+              <block type="limit_order_1inch" x="200" y="950">
+                <field name="ORDER_SIDE">SELL</field>
+                <value name="AMOUNT">
+                  <block type="portfolio_balance" x="200" y="1000">
+                    <field name="BALANCE_TYPE">POSITION_VALUE</field>
+                    <field name="ASSET">ETH</field>
+                  </block>
+                </value>
+                <field name="FROM_TOKEN">ETH</field>
+                <field name="TO_TOKEN">USDT</field>
+                <value name="LIMIT_PRICE">
+                  <block type="get_price" x="200" y="1050">
+                    <field name="ASSET">ETH</field>
+                    <field name="EXCHANGE">BINANCE</field>
+                  </block>
+                </value>
+                <field name="EXPIRY">4H</field>
+              </block>
+            </statement>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>`,
+  },
+  "1inch-scalping": {
+    id: "1inch-scalping",
+    name: "1inch Scalping",
+    description: "High-frequency scalping with 1inch limit orders",
+    prompt: "Scalp with 0.5% profit targets using 1inch limit orders",
+    icon: <Zap className="w-5 h-5" />,
+    category: "1inch",
+    blocklyXml: `<xml xmlns="https://developers.google.com/blockly/xml">
+  <block type="strategy_start" x="200" y="100">
+    <statement name="DO">
+      <block type="limit_order_strategy" x="200" y="200">
+        <field name="STRATEGY_TYPE">SCALPING</field>
+        <field name="RISK_LEVEL">AGGRESSIVE</field>
+        <statement name="CONFIG">
+          <block type="limit_order_config" x="200" y="300">
+            <field name="GRID_SPACING">0.005</field>
+            <field name="POSITION_SIZE">0.02</field>
+            <field name="MAX_ORDERS">50</field>
+            <field name="SLIPPAGE_TOLERANCE">0.001</field>
+          </block>
+          <block type="controls_repeat_ext" x="200" y="400">
+            <value name="TIMES">
+              <block type="math_number" x="200" y="450">
+                <field name="NUM">20</field>
+              </block>
+            </value>
+            <statement name="DO">
+              <block type="limit_order_1inch" x="200" y="500">
+                <field name="ORDER_SIDE">BUY</field>
+                <value name="AMOUNT">
+                  <block type="math_number" x="200" y="550">
+                    <field name="NUM">25</field>
+                  </block>
+                </value>
+                <field name="FROM_TOKEN">USDT</field>
+                <field name="TO_TOKEN">SOL</field>
+                <value name="LIMIT_PRICE">
+                  <block type="math_arithmetic" x="200" y="600">
+                    <field name="OP">MULTIPLY</field>
+                    <value name="A">
+                      <block type="get_price" x="200" y="650">
+                        <field name="ASSET">SOL</field>
+                        <field name="EXCHANGE">BINANCE</field>
+                      </block>
+                    </value>
+                    <value name="B">
+                      <block type="math_number" x="200" y="700">
+                        <field name="NUM">0.995</field>
+                      </block>
+                    </value>
+                  </block>
+                </value>
+                <field name="EXPIRY">1H</field>
+              </block>
+            </statement>
+          </block>
+        </statement>
+      </block>
+    </statement>
+  </block>
+</xml>`,
+  },
 };
 
 export function getTemplate(id: string): Template | undefined {

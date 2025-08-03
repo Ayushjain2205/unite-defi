@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@1inch/fusion-sdk": "^2.3.6",
+    "@1inch/limit-order-sdk": "^5.0.4-rc.0",
+    "ethers": "^5.7.2",
     "@hookform/resolvers": "^3.9.0",
     "@next/swc-wasm-nodejs": "13.5.1",
     "@radix-ui/react-accordion": "^1.2.0",
